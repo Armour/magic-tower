@@ -1,0 +1,1094 @@
+uses crt;
+const
+ m1:array[1..14,1..14]of integer=
+((02,02,02,02,02,02,02,02,02,02,02,02,02,02),
+ (02,00,00,00,02,30,02,00,00,00,02,06,06,02),
+ (02,00,02,00,02,11,02,00,02,00,02,06,06,02),
+ (02,00,02,00,02,06,02,06,02,00,02,00,00,02),
+ (02,04,02,00,02,03,02,00,02,00,02,04,02,02),
+ (02,00,02,00,00,00,00,00,02,00,00,00,00,02),
+ (02,11,02,02,12,02,02,02,02,02,02,02,03,02),
+ (02,12,03,03,00,00,00,00,00,00,00,00,00,02),
+ (02,13,02,02,02,02,02,02,02,02,11,02,02,02),
+ (02,00,02,00,00,06,00,00,06,00,00,03,14,02),
+ (02,30,02,00,02,02,02,03,02,02,00,02,30,02),
+ (02,00,02,00,02,00,00,00,00,02,00,02,02,02),
+ (02,35,02,30,02,00,01,00,06,02,00,03,81,02),
+ (02,02,02,02,02,02,02,02,02,02,02,02,02,02));
+ m2:array[1..14,1..14]of integer=
+((02,02,02,02,02,02,02,02,02,02,02,02,02,02),
+ (02,30,03,00,02,00,02,30,32,30,02,06,00,02),
+ (02,00,02,00,02,00,02,00,02,15,02,00,00,02),
+ (02,12,02,00,02,00,02,13,02,14,02,00,00,02),
+ (02,00,02,00,02,00,02,00,02,13,02,11,00,02),
+ (02,11,02,00,02,00,02,00,02,00,02,00,12,02),
+ (02,00,02,03,02,03,02,04,02,03,02,03,02,02),
+ (02,00,00,00,00,00,00,00,13,00,00,00,00,02),
+ (02,03,02,02,02,04,02,03,02,03,02,03,02,02),
+ (02,11,02,82,02,00,02,00,02,00,02,00,06,02),
+ (02,00,02,00,02,00,02,00,02,00,02,00,00,02),
+ (02,00,02,12,02,00,02,00,02,00,02,00,02,02),
+ (02,00,00,00,02,00,02,06,09,06,02,01,92,02),
+ (02,02,02,02,02,02,02,02,02,02,02,02,02,02));
+  m3:array[1..14,1..14]of integer=
+((02,02,02,02,02,02,02,02,02,02,02,02,02,02),
+ (02,31,09,09,00,50,51,52,02,00,07,00,00,02),
+ (02,02,02,02,00,00,03,02,02,02,02,02,00,02),
+ (02,00,03,13,02,00,02,02,12,02,12,02,12,02),
+ (02,00,02,02,02,00,00,02,00,00,00,00,09,02),
+ (02,13,00,00,00,02,00,02,00,02,02,02,02,02),
+ (02,00,02,02,16,02,00,00,00,00,03,13,30,02),
+ (02,00,02,33,09,02,00,02,00,02,02,02,02,02),
+ (02,00,02,02,02,02,00,00,00,00,03,06,06,02),
+ (02,00,02,93,02,02,00,00,02,02,02,02,02,02),
+ (02,00,02,01,02,02,02,00,00,00,03,13,30,02),
+ (02,00,00,11,00,00,12,00,02,02,02,02,02,02),
+ (02,00,02,06,02,00,02,00,00,00,03,12,83,02),
+ (02,02,02,02,02,02,02,02,02,02,02,02,02,02));
+  m4:array[1..14,1..14]of integer=
+((02,02,02,02,02,02,02,02,02,02,02,02,02,02),
+ (02,00,00,00,00,00,00,00,00,00,00,00,00,02),
+ (02,00,00,00,00,00,00,16,00,00,00,00,00,02),
+ (02,00,00,00,00,00,00,00,00,00,00,00,00,02),
+ (02,00,00,17,00,00,00,16,00,00,00,00,00,02),
+ (02,00,00,00,00,00,00,00,00,00,00,00,00,02),
+ (02,00,00,00,00,00,00,00,00,00,00,00,00,02),
+ (02,00,00,00,00,00,00,16,00,00,00,00,00,02),
+ (02,00,00,00,00,00,00,00,00,00,00,00,00,02),
+ (02,00,00,84,00,00,00,00,00,00,00,00,00,02),
+ (02,00,00,00,00,00,00,16,00,00,00,00,00,02),
+ (02,00,00,00,00,00,00,00,00,00,17,00,02,02),
+ (02,00,00,00,00,00,00,00,00,00,00,01,94,02),
+ (02,02,02,02,02,02,02,02,02,02,02,02,02,02));
+
+  hp:array [11..17] of integer    =(50,60,45,150,95,50,60);
+  Attak:array [11..17] of integer =(12,14,35, 17,20,16,17);
+  Defend:array [11..17] of integer=( 9,10, 4,  7,11,35,10);
+  mo:array [11..17] of integer    =( 3, 6,10, 15,20,26,15);
+  ex:array [11..17] of integer    =( 1, 3, 5,  7, 8,10, 7);
+
+var
+  m:array[1..4,1..14,1..14]of integer;
+  mt:array[1..14,1..14]of boolean;
+  HP1,Attak1,Defend1,now_I,now_J,Money,Exp,Lv,Exp_Need:longint;
+  key_num:array[6..8]of integer;
+  map:array[0..14,0..14]of integer;
+  sword,shield,bok:boolean;
+  ch:char;
+
+procedure print;
+var 
+  i,j:integer;
+begin
+  for i:=1 to 14 do
+    for j:=1 to 14 do
+      if mt[i,j]=false then
+      begin
+        if map[i,j] in [2,9] then
+        begin
+		    textcolor(white);
+          gotoxy(j*5,i*3);    write('#####');
+          gotoxy(j*5,i*3+1);  write('#####');
+          gotoxy(j*5,i*3+2);  write('#####');
+        end else 
+        if map[i,j] in [3,4,5] then
+        begin
+          if map[i,j]=3 then textcolor(yellow)
+            else if map[i,j]=4 then textcolor(123)
+              else if map[i,j]=5 then textcolor(red);
+           gotoxy(j*5,i*3);    write(' --- ');
+           gotoxy(j*5,i*3+1);  write('/***\');
+           gotoxy(j*5,i*3+2);  write('I***I');
+        end else 
+        if map[i,j] in [0] then
+        begin
+          gotoxy(j*5,i*3);    write('     ');
+          gotoxy(j*5,i*3+1);  write('     ');
+          gotoxy(j*5,i*3+2);  write('     ');
+        end
+        else if map[i,j] in [1] then
+        begin
+           textcolor(yellow);
+           gotoxy(j*5,i*3);    write(' ^^^ ');
+           gotoxy(j*5,i*3+1);  write('|o o|');
+           gotoxy(j*5,i*3+2);  write('\_v_/');
+        end
+        else if map[i,j] in [6,7,8] then
+        begin
+          if map[i,j]=6 then textcolor(yellow)
+            else if map[i,j]=7 then textcolor(123)
+              else if map[i,j]=8 then textcolor(red);
+          gotoxy(j*5,i*3);    write(' {O} ');
+          gotoxy(j*5,i*3+1);  write('  H  ');
+          gotoxy(j*5,i*3+2);  write('  F  ');
+        end
+        else if map[i,j] in [81,82,83,84,85,86,87,88,89] then
+        begin
+          textcolor(red);
+          gotoxy(j*5,i*3);    write('^ ^ ^');
+          gotoxy(j*5,i*3+1);  write('| | |');
+          gotoxy(j*5,i*3+2);  write('| | |');
+        end
+        else if map[i,j] in [92,93,94,95,96,97,98,99] then
+        begin
+          textcolor(red);
+          gotoxy(j*5,i*3);    write('| | |');
+          gotoxy(j*5,i*3+1);  write('| | |');
+          gotoxy(j*5,i*3+2);  write('v v v');
+        end
+        else if map[i,j] in [31] then
+        begin
+          textcolor(green);
+          gotoxy(j*5,i*3);    write(' A  G');
+          gotoxy(j*5,i*3+1);  write(' H  +');
+          gotoxy(j*5,i*3+2);  write('<H> +');
+        end
+        else if map[i,j] in [33] then
+        begin
+          textcolor(green);
+          gotoxy(j*5,i*3);    write('___ F');
+          gotoxy(j*5,i*3+1);  write('|X| +');
+          gotoxy(j*5,i*3+2);  write('\_/ +');
+        end
+        else if map[i,j] in [30] then
+        begin
+          textcolor(green);
+          gotoxy(j*5,i*3);    write(' || H');
+          gotoxy(j*5,i*3+1);  write('/==\ ');
+          gotoxy(j*5,i*3+2);  write('\==/ ');
+        end
+        else if map[i,j] in [11] then
+        begin
+          textcolor(5);
+          gotoxy(j*5,i*3);    write(' --- ');
+          gotoxy(j*5,i*3+1);  write('|o o|');
+          gotoxy(j*5,i*3+2);  write('|___|');
+        end
+        else if map[i,j] in [12] then
+        begin
+          textcolor(5);
+          gotoxy(j*5,i*3);    write(' --- ');
+          gotoxy(j*5,i*3+1);  write('|O O|');
+          gotoxy(j*5,i*3+2);  write('\_o_/');
+        end
+        else if map[i,j] in [13] then
+        begin
+          textcolor(5);
+          gotoxy(j*5,i*3);    write(' === ');
+          gotoxy(j*5,i*3+1);  write('(O O)');
+          gotoxy(j*5,i*3+2);  write('\_^_/');
+        end
+        else if map[i,j] in [15] then
+        begin
+          textcolor(5);
+          gotoxy(j*5,i*3);    write(' \^/ ');
+          gotoxy(j*5,i*3+1);  write('<o o>');
+          gotoxy(j*5,i*3+2);  write('V\x/V');
+        end
+        else if map[i,j] in [14] then
+        begin
+          textcolor(5);
+          gotoxy(j*5,i*3);    write('/---\');
+          gotoxy(j*5,i*3+1);  write('|o o|');
+          gotoxy(j*5,i*3+2);  write('v^^^v');
+        end
+        else if map[i,j] in [16] then
+        begin
+          textcolor(5);
+          gotoxy(j*5,i*3);    write('UUUUU');
+          gotoxy(j*5,i*3+1);  write('|o o|');
+          gotoxy(j*5,i*3+2);  write('-----');
+        end
+        else if map[i,j] in [17] then
+        begin
+          textcolor(5);
+          gotoxy(j*5,i*3);    write('Y M Y');
+          gotoxy(j*5,i*3+1);  write('[O O]');
+          gotoxy(j*5,i*3+2);  write('XXXXX');
+        end
+        else if map[i,j] in [50] then
+        begin
+          textcolor(green);
+          gotoxy(j*5,i*3);    write('/====');
+          gotoxy(j*5,i*3+1);  write('|shop');
+          gotoxy(j*5,i*3+2);  write('|____');
+        end
+        else if map[i,j] in [52] then
+        begin
+          textcolor(green);
+          gotoxy(j*5,i*3);    write('====\');
+          gotoxy(j*5,i*3+1);  write('shop|');
+          gotoxy(j*5,i*3+2);  write('____|');
+        end
+        else if map[i,j] in [51] then
+        begin
+          textcolor(green);
+          gotoxy(j*5,i*3);    write('=====');
+          gotoxy(j*5,i*3+1);  write(' ___ ');
+          gotoxy(j*5,i*3+2);  write('|___|');
+        end
+        else if map[i,j] in [35] then
+        begin
+          textcolor(green);
+          gotoxy(j*5,i*3);    write('|===|');
+          gotoxy(j*5,i*3+1);  write('|bok|');
+          gotoxy(j*5,i*3+2);  write('|___|');
+        end
+        else if map[i,j] in [32] then
+        begin
+          textcolor(green);
+          gotoxy(j*5,i*3);    write(' 攻  ');
+          gotoxy(j*5,i*3+1);  write(' 击  ');
+          gotoxy(j*5,i*3+2);  write(' +3  ');
+        end;
+      end;
+  fillchar(mt,sizeof(mt),true);
+end;
+
+procedure quit;
+var 
+  i,j:integer;
+begin
+  for i:=1 to 14 do
+    for j:=1 to 14 do
+      mt[i,j]:=false;
+  clrscr;
+  print;
+end;
+
+procedure up(n:integer);
+var 
+  i,j:integer;
+begin
+  clrscr;
+  if n=1 then
+  begin
+    for i:=1 to 14 do
+    for j:=1 to 14 do
+    begin
+      m[1,i,j]:=map[i,j];
+      map[i,j]:=m[2,i,j];
+      mt[i,j]:=false;
+    end;
+    print;
+  end;
+  if n=2 then
+  begin
+    for i:=1 to 14 do
+    for j:=1 to 14 do
+    begin
+      m[2,i,j]:=map[i,j];
+      map[i,j]:=m[3,i,j];
+      mt[i,j]:=false;
+    end;
+    print;
+  end;
+  if n=3 then begin
+    for i:=1 to 14 do
+    for j:=1 to 14 do
+    begin
+      m[3,i,j]:=map[i,j];
+      map[i,j]:=m[4,i,j];
+      mt[i,j]:=false;
+    end;
+    print;
+  end;
+end;
+
+
+procedure down(n:integer);
+var 
+  i,j:integer;
+begin
+  clrscr;
+  if n=2 then
+  begin
+    for i:=1 to 14 do
+    for j:=1 to 14 do
+    begin
+      m[2,i,j]:=map[i,j];
+      map[i,j]:=m[1,i,j];
+      mt[i,j]:=false;
+    end;
+    print;
+  end;
+ if n=3 then
+  begin
+    for i:=1 to 14 do
+    for j:=1 to 14 do
+    begin
+      m[3,i,j]:=map[i,j];
+      map[i,j]:=m[2,i,j];
+      mt[i,j]:=false;
+    end;
+    print;
+  end;
+  if n=4 then
+  begin
+    for i:=1 to 14 do
+    for j:=1 to 14 do
+    begin
+      m[4,i,j]:=map[i,j];
+      map[i,j]:=m[3,i,j];
+      mt[i,j]:=false;
+    end;
+    print;
+  end;
+end;
+
+
+procedure look;
+var
+  i,j:integer;
+  chb:char;
+begin
+  clrscr;
+  gotoxy(1,10);
+  write('                ');  textcolor(yellow); writeln('Yellow key:   ',key_num[6]);
+  gotoxy(1,12);
+  write('                ');  textcolor(123);    writeln('Blue key:     ',key_num[7]);
+  gotoxy(1,14);
+  write('                ');  textcolor(red);    writeln('Red key:      ',key_num[8]);
+  textcolor(green);
+  gotoxy(1,17);
+  write('                ');
+  write('HP: ',HP1,'        ');
+  write('Attak: ',Attak1,'        ');
+  writeln('Defend: ',Defend1);
+  gotoxy(1,19);
+  textcolor(white);
+  write('                ');
+  write('Lv: ',Lv:3,'        ');
+  write('Money: ',Money,'         ');
+  writeln('Exp:    ',Exp,'         ');
+  gotoxy(1,21);
+  write('                ');
+  write('next Lv:   ',Exp_Need-Exp);
+  gotoxy(20,25);
+  write('     please enter ''e'' to exit.   ');
+  while true do
+  begin
+    chb:=readkey;
+    if chb='e' then
+    begin
+      quit;
+      break;
+    end;
+  end;
+end;
+
+procedure shop;
+var 
+  i,j:integer;   
+  ch:char;
+begin
+  repeat
+  clrscr; 
+  gotoxy(3,8);
+  textcolor(yellow);
+    writeln('  Shop:''''Money! Money! Give me your Money!!!''''');  
+    writeln;
+    writeln('      1. HP+30  cost 50');       writeln;
+    writeln('      2. Attak+2   cost 50');    writeln;
+    writeln('      3. Defend+1   cost 50');   writeln;
+    writeln('      4. ykey+1 cost 40');       writeln;
+    writeln('      5. bkey+1 cost 120');      writeln;
+    writeln('      6. rkey+1 cost 300');      writeln;
+    gotoxy(10,23);  writeln('your Money: ',Money);
+    gotoxy(20,28);  writeln('     please enter ''e'' to exit.   ');
+    ch:=readkey;
+    if ch='1' then 
+    begin 
+      if Money>=50 then 
+      begin 
+        Money:=Money-50; 
+        HP1:=HP1+30; 
+        writeln('   1  OK!'); 
+      end 
+    end else
+    if ch='2' then 
+    begin 
+      if Money>=50 then 
+      begin 
+        Money:=Money-50; 
+        Attak1:=Attak1+2;  
+        writeln('   2  OK!'); 
+      end 
+    end else
+    if ch='3' then 
+    begin 
+      if Money>=50 then 
+      begin 
+        Money:=Money-50; 
+        Defend1:=Defend1+1;  
+        writeln('   3  OK!'); 
+      end 
+    end else
+    if ch='4' then 
+    begin 
+      if Money>=40 then 
+      begin 
+        Money:=Money-40;  
+        key_num[6]:=key_num[6]+1;
+        writeln('   4  OK!');
+      end 
+    end else
+    if ch='5' then 
+    begin 
+      if Money>=120 then 
+      begin 
+        Money:=Money-120;
+        key_num[7]:=key_num[7]+1;
+        writeln('   5  OK!'); 
+      end 
+    end else
+    if ch='6' then 
+    begin 
+      if Money>=300 then 
+      begin 
+        Money:=Money-300;
+        key_num[8]:=key_num[8]+1;
+        writeln('   6  OK!'); 
+      end 
+    end;
+    gotoxy(10,23); 
+    writeln('your Money: ',Money);
+    if  ch='e' then quit;
+  until ch='e';
+end;
+
+procedure book;
+var 
+  chb:char;
+begin
+  if (bok) then
+  begin
+    clrscr;
+    textcolor(yellow);
+    gotoxy(2,2);  write(' --- ');
+    gotoxy(2,3);  write('|o o|');
+    gotoxy(2,4);  write('|_o_|');
+    gotoxy(10,3);       write(' HP: ',hp[11]:3,'    Attak: ',Attak[11]:3,'    Defend: ',Defend[11]:3);
+    gotoxy(2,6);  write(' --- ');
+    gotoxy(2,7);  write('|O O|');
+    gotoxy(2,8);  write('\_o_/');
+    gotoxy(10,7);       write(' HP: ',hp[12]:3,'    Attak: ',Attak[12]:3,'    Defend: ',Defend[12]:3);
+    gotoxy(2,10); write(' === ');
+    gotoxy(2,11); write('(O O)');
+    gotoxy(2,12); write('\_^_/');
+    gotoxy(10,11);      write(' HP: ',hp[13]:3,'    Attak: ',Attak[13]:3,'    Defend: ',Defend[13]:3);
+    gotoxy(2,14); write('/---\');
+    gotoxy(2,15); write('|o o|');
+    gotoxy(2,16); write('v^^^v');
+    gotoxy(10,15);      write(' HP: ',hp[14]:3,'    Attak: ',Attak[14]:3,'    Defend: ',Defend[14]:3);
+    gotoxy(2,18); write(' \^/ ');
+    gotoxy(2,19); write('<o o>');
+    gotoxy(2,20); write('V\x/V');
+    gotoxy(10,19);      write(' HP: ',hp[15]:3,'    Attak: ',Attak[15]:3,'    Defend: ',Defend[15]:3);
+    gotoxy(2,22); write('UUUUU');
+    gotoxy(2,23); write('|o o|');
+    gotoxy(2,24); write('-----');
+    gotoxy(10,23);      write(' HP: ',hp[16]:3,'    Attak: ',Attak[16]:3,'    Defend: ',Defend[16]:3);
+    gotoxy(2,26); write('Y M Y');
+    gotoxy(2,27); write(' o o');
+    gotoxy(2,28); write('XXXXX');
+    gotoxy(10,27);      write(' HP: ',hp[17]:3,'    Attak: ',Attak[17]:3,'    Defend: ',Defend[17]:3);
+    gotoxy(20,40);
+    writeln('     please enter ''e'' to exit.   ');
+  end;
+  while true do
+  begin
+    chb:=readkey;
+    if chb='e' then
+    begin
+      quit;
+      break;
+    end;
+  end;
+end;
+
+procedure over;
+begin
+  clrscr;
+  gotoxy(32,20);
+  writeln('you lost.........');
+  readln;
+  halt;
+end;
+
+procedure fighting(n:integer);
+var
+  i,j,ghp,gDefend,gAttak,aaa,bbb,aa,bb,shan,bow,gs,gb:longint;
+begin
+  clrscr;
+  randomize;
+  ghp:=hp[n];
+  gAttak:=Attak[n];
+  gDefend:=Defend[n]; 
+  textcolor(yellow);
+  for i:=1 to 30 do write('-');  
+  for i:=1 to 15 do write(' ');  
+  for i:=1 to 30 do write('-');
+  gotoxy(1,2);  write('|                            | ppp   k  k   |                             |');
+  gotoxy(1,3);  write('|                            | p  p  k k    |                             |');
+  gotoxy(1,4);  write('|                            | ppp   kk     |                             |');
+  gotoxy(1,5);  write('|                            | p     k k    |                             |');
+  gotoxy(1,6);  write('|                            | p     k  k   |                             |');
+  writeln;
+  for i:=1 to 30 do write('-');  
+  for i:=1 to 15 do write(' ');  
+  for i:=1 to 30 do write('-');
+  writeln;
+  if n=11 then
+  begin
+    textcolor(5);
+    gotoxy(12,2);  write(' ----- ');
+    gotoxy(12,3);  write(' |O O| ');
+    gotoxy(12,4);  write(' |___| ');
+    shan:=96; 
+    bow:=8; 
+    gs:=92; 
+    gb:=5;
+  end;
+  if n=12 then
+  begin
+    textcolor(5);
+    gotoxy(12,2);  write(' -----  ');
+    gotoxy(12,3);  write('| O O | ');
+    gotoxy(12,4);  write('|  o  | ');
+    gotoxy(12,5);  write(' \___/  ');
+    shan:=96; 
+    bow:=8;
+    gs:=92; 
+    gb:=5;
+  end;
+  if n=15 then
+  begin
+    textcolor(5);
+    gotoxy(12,2);  write('  \ A /  ');
+    gotoxy(12,3);  write(' / \ / \ ');
+    gotoxy(12,4);  write('< O   O >');
+    gotoxy(12,5);  write(' |     | ');
+    gotoxy(12,6);  write('V \_X_/ V');
+    shan:=96; 
+    bow:=3; 
+    gs:=92; 
+    gb:=15;
+  end;
+  if n=14 then
+  begin
+    textcolor(5);
+    gotoxy(12,2);  write(' /-----\  ');
+    gotoxy(12,3);  write('/       \ ');
+    gotoxy(12,4);  write('| O   O | ');
+    gotoxy(12,5);  write('|       | ');
+    gotoxy(12,6);  write(' V ^^^ V  ');
+    shan:=94; 
+    bow:=10; 
+    gs:=95; 
+    gb:=5;
+  end;
+  if n=16 then
+  begin
+    textcolor(5);
+    gotoxy(12,2);  write(' UUUUUUUU');
+    gotoxy(12,3);  write('  o    o ');
+    gotoxy(12,4);  write('    --   ');
+    gotoxy(12,5);  write(' nnnnnnnn');
+    shan:=94; 
+    bow:=8; 
+    gs:=92; 
+    gb:=7;
+  end;
+  if n=17 then
+  begin
+    textcolor(5);
+    gotoxy(12,2);  write('  Y  M  Y      ');
+    gotoxy(12,3);  write('   O   O       ');
+    gotoxy(12,4);  write('    ---        ');
+    gotoxy(12,5);  write('  X X X X      ');
+    shan:=50; 
+    bow:=10; 
+    gs:=91; 
+    gb:=5;
+  end;
+  if n=13 then
+  begin
+    textcolor(5);
+    gotoxy(12,2);  write(' ===== ');
+    gotoxy(12,3);  write('( O O )');
+    gotoxy(12,4);  write('|     |');
+    gotoxy(12,5);  write(' \_^_/ ');
+    shan:=96; 
+    bow:=8; 
+    gs:=92; 
+    gb:=5;
+  end;
+  begin
+    textcolor(green);
+    gotoxy(55,2);  write('   ^^^^^   ');
+    gotoxy(55,3);  write('  ^^vvv^^  ');
+    gotoxy(55,4);  write(' ( O   O ) ');
+    gotoxy(55,5);  write(' |   V   | ');
+    gotoxy(55,6);  write('O \_____/ O');
+  end;
+  if sword then 
+  begin
+    textcolor(green);
+    gotoxy(48,2);  write('  A  ');
+    gotoxy(48,3);  write('  H  ');
+    gotoxy(48,4);  write('  H  ');
+    gotoxy(48,5);  write('<=O=>');
+    gotoxy(48,6);  write('  H  ');
+  end;
+  if shield then 
+  begin
+    textcolor(green);
+    gotoxy(68,2);  write('TTTTTTT ');
+    gotoxy(68,3);  write('||   || ');
+    gotoxy(68,4);  write('||   || ');
+    gotoxy(68,5);  write('\\___// ');
+    gotoxy(68,6);  write(' \___/  ');
+  end;
+  Money:=Money+mo[n];
+  Exp:=Exp+ex[n];
+  gotoxy(1,9);
+  textcolor(white);
+  writeln('         ',ghp:5,'                                            ',hp1);
+  repeat
+    bbb:=random(100)+1;
+    if (bbb<shan)and(bbb>bow) then
+    begin
+      aaa:=Attak1-gDefend;
+      if aaa<0 then aaa:=0;
+      ghp:=ghp-aaa;
+      if ghp<0 then ghp:=0;
+      write('         ',ghp:5,'                           ');
+    end;
+    if bbb>=shan then
+      write('         ',ghp:5,'           Miss...         ');
+    if bbb<=bow then
+    begin
+      aaa:=trunc((Attak1-gDefend)*1.5);
+      if aaa<0 then aaa:=0;
+      ghp:=ghp-aaa;
+      if ghp<0 then ghp:=0;
+      write('         ',ghp:5,'           Bow !!!         ');
+    end;
+    if ghp<=0 then break;
+    delay(200);
+    bb:=random(100)+1;
+    if (bb<gs)and(bb>gb) then
+    begin
+      aa:=gAttak-Defend1;
+      if aa<0 then aa:=0;
+      HP1:=HP1-aa;
+      if HP1<0 THEN HP1:=0;
+      writeln('                 ',HP1);
+    end;
+    if bb>=gs then
+      writeln('Miss...          ',hp1);
+    if bb<=gb then
+    begin
+      aa:=trunc((gAttak-Defend1)*1.5);
+      if aa<0 then aa:=0;
+      hp1:=hp1-aa;
+      if hp1<0 then hp1:=0;
+      writeln('bow !!!          ',hp1);
+    end;
+    if hp1<=0 then break;
+    delay(200);
+  until false;
+
+  writeln;
+  textcolor(red);
+  if hp1>0 then 
+  begin
+    writeln('                                  You Win!!!  ');
+    writeln; 
+    writeln; 
+    writeln;
+    writeln('                        You earn ',mo[n],' Money and ',ex[n],' Exp!!      ');  
+  end;
+  if HP1<=0 then over;
+  if Exp>=Exp_Need then
+  begin
+    Exp:=Exp-Exp_Need; 
+    Exp_Need:=trunc(Exp_Need*1.5)+1;
+    hp1:=hp1+10; 
+    Attak1:=Attak1+1; 
+    Defend1:=Defend1+1; 
+    gotoxy(1,32);  
+    Lv:=Lv+1;
+    writeln('                                  Lv  up  !!!!      '); writeln;
+    writeln('                         HP+10!    Attak+1!     Defend+1!        ');
+  end;
+  readln;
+  for i:=1 to 14 do
+    for j:=1 to 14 do
+      mt[i,j]:=false;
+  clrscr;
+end;
+
+procedure run(ch:char);
+begin
+  if ch in['w','a','s','d'] then
+  begin
+    if ch='w' then 
+      begin
+        if (map[now_I-1,now_J] in [0,9]) then 
+        begin 
+          mt[now_I-1,now_J]:=false;
+          mt[now_I,now_J]:=false; 
+          map[now_I-1,now_J]:=1;
+          map[now_I,now_J]:=0;
+          now_I:=now_I-1;
+        end else
+        if (map[now_I-1,now_J]=30) then 
+        begin 
+          mt[now_I-1,now_J]:=false;
+          mt[now_I,now_J]:=false; 
+          map[now_I-1,now_J]:=1;
+          map[now_I,now_J]:=0;
+          now_I:=now_I-1;
+          hp1:=hp1+30;
+        end else
+        if (map[now_I-1,now_J]=51) then shop else
+          if (map[now_I-1,now_J]=82) then up(2) else
+            if (map[now_I-1,now_J]=93) then down(3) else
+              if (map[now_I-1,now_J] in [3,4,5]) then 
+              begin 
+                if key_num[map[now_I-1,now_J]+3]>0 then 
+                begin 
+                  key_num[map[now_I-1,now_J]+3]:=key_num[map[now_I-1,now_J]+3]-1;
+                  mt[now_I-1,now_J]:=false;
+                  mt[now_I,now_J]:=false;
+                  map[now_I-1,now_J]:=1;
+                  map[now_I,now_J]:=0;
+                  now_I:=now_I-1;
+                end 
+              end else
+              if (map[now_I-1,now_J] in [6,7,8]) then 
+              begin 
+                key_num[map[now_I-1,now_J]]:=key_num[map[now_I-1,now_J]]+1;
+                mt[now_I-1,now_J]:=false;
+                mt[now_I,now_J]:=false;
+                map[now_I-1,now_J]:=1;
+                map[now_I,now_J]:=0;
+                now_I:=now_I-1;
+              end else
+              if (map[now_I-1,now_J] in [11,12,13,14,15,16,17]) then
+              begin 
+                mt[now_I-1,now_J]:=false;
+                mt[now_I,now_J]:=false;
+                fighting(map[now_I-1,now_J]);
+                map[now_I-1,now_J]:=1;
+                map[now_I,now_J]:=0;
+                now_I:=now_I-1;
+              end else
+              if (map[now_I-1,now_J]=32) then 
+              begin 
+                mt[now_I-1,now_J]:=false;
+                mt[now_I,now_J]:=false;
+                map[now_I-1,now_J]:=1;
+                map[now_I,now_J]:=0;
+                now_I:=now_I-1;
+                Attak1:=Attak1+3;
+              end;
+    end else 
+
+  if ch='s' then 
+  begin
+    if (map[now_I+1,now_J]=30) then 
+    begin 
+      mt[now_I+1,now_J]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I+1,now_J]:=1;
+      map[now_I,now_J]:=0;
+      now_I:=now_I+1;
+      hp1:=hp1+30;
+    end else
+    if (map[now_I+1,now_J]=35) then 
+    begin 
+      mt[now_I+1,now_J]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I+1,now_J]:=1;
+      map[now_I,now_J]:=0;
+      now_I:=now_I+1;
+      bok:=true;
+    end else
+    if (map[now_I+1,now_J] in [3,4,5]) then 
+    begin 
+      if key_num[map[now_I+1,now_J]+3]>0 then 
+      begin 
+        key_num[map[now_I+1,now_J]+3]:=key_num[map[now_I+1,now_J]+3]-1;
+        mt[now_I+1,now_J]:=false;
+        mt[now_I,now_J]:=false;
+        map[now_I+1,now_J]:=1;
+        map[now_I,now_J]:=0;
+        now_I:=now_I+1;
+      end 
+    end else
+    if (map[now_I+1,now_J] in [6,7,8]) then 
+    begin 
+      key_num[map[now_I+1,now_J]]:=key_num[map[now_I+1,now_J]]+1;
+      mt[now_I+1,now_J]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I+1,now_J]:=1;
+      map[now_I,now_J]:=0;
+      now_I:=now_I+1;
+    end else
+    if (map[now_I+1,now_J]=32) then 
+    begin 
+      mt[now_I+1,now_J]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I+1,now_J]:=1;
+      map[now_I,now_J]:=0;
+      now_I:=now_I+1;
+      Attak1:=Attak1+3;
+    end else
+    if (map[now_I+1,now_J]=33) then 
+    begin 
+      mt[now_I+1,now_J]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I+1,now_J]:=1;
+      map[now_I,now_J]:=0;
+      now_I:=now_I+1;
+      Defend1:=Defend1+8;
+    end else
+    if (map[now_I+1,now_J] in [11,12,13,14,15,16,17]) then
+    begin 
+      mt[now_I+1,now_J]:=false;
+      mt[now_I,now_J]:=false;
+      fighting(map[now_I+1,now_J]);
+      map[now_I+1,now_J]:=1;
+      map[now_I,now_J]:=0;
+      now_I:=now_I+1;
+    end else
+    if (map[now_I+1,now_J] in [0,9]) then 
+    begin 
+      mt[now_I+1,now_J]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I+1,now_J]:=1;
+      map[now_I,now_J]:=0;
+      now_I:=now_I+1;
+    end;
+  end else 
+
+  if ch='a' then 
+  begin
+    if (map[now_I,now_J-1] in [3,4,5]) then 
+    begin 
+      if key_num[map[now_I,now_J-1]+3]>0 then 
+      begin 
+        key_num[map[now_I,now_J-1]+3]:=key_num[map[now_I,now_J-1]+3]-1;
+        mt[now_I,now_J-1]:=false;
+        mt[now_I,now_J]:=false;
+        map[now_I,now_J-1]:=1;
+		
+        map[now_I,now_J]:=0;
+        now_J:=now_J-1;
+      end 
+    end else
+    if (map[now_I,now_J-1] in [0,9]) then 
+    begin 
+      mt[now_I,now_J-1]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I,now_J-1]:=1;
+      map[now_I,now_J]:=0;
+      now_J:=now_J-1;
+    end else
+    if (map[now_I,now_J-1]=30) then 
+    begin 
+      mt[now_I,now_J-1]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I,now_J-1]:=1;
+      map[now_I,now_J]:=0;
+      now_J:=now_J-1;
+      hp1:=hp1+30;
+    end else
+    if (map[now_I,now_J-1]=32) then 
+    begin 
+      mt[now_I,now_J-1]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I,now_J-1]:=1;
+      map[now_I,now_J]:=0;
+      now_J:=now_J-1;
+      Attak1:=Attak1+3;
+    end else
+    if (map[now_I,now_J-1]=31) then 
+    begin 
+      mt[now_I,now_J-1]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I,now_J-1]:=1;
+      map[now_I,now_J]:=0;
+      now_J:=now_J-1;
+      sword:=true;
+      Attak1:=Attak1+10;
+    end else
+    if (map[now_I+1,now_J]=33) then 
+    begin 
+      mt[now_I+1,now_J]:=false;
+      mt[now_I,now_J]:=false;map[now_I+1,now_J]:=1;
+      map[now_I,now_J]:=0;
+      now_I:=now_I+1;
+      Defend1:=Defend1+8;
+    end else
+    if (map[now_I,now_J-1] in [11,12,13,14,15,16,17]) then
+    begin 
+      mt[now_I,now_J-1]:=false;
+      mt[now_I,now_J]:=false;
+      fighting(map[now_I,now_J-1]);
+      map[now_I,now_J-1]:=1;
+      map[now_I,now_J]:=0;
+      now_J:=now_J-1;
+    end else
+    if (map[now_I,now_J-1] in [6,7,8]) then 
+    begin 
+      key_num[map[now_I,now_J-1]]:=key_num[map[now_I,now_J-1]]+1;
+      mt[now_I,now_J-1]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I,now_J-1]:=1;
+      map[now_I,now_J]:=0;
+      now_J:=now_J-1;
+    end;
+  end else
+
+  if ch='d' then 
+  begin
+    if (map[now_I,now_J+1] in [0,9]) then 
+    begin
+      mt[now_I,now_J+1]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I,now_J+1]:=1;
+      map[now_I,now_J]:=0;
+      now_J:=now_J+1;
+    end else
+    if (map[now_I,now_J+1]=30) then 
+    begin 
+      mt[now_I,now_J+1]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I,now_J+1]:=1;
+      map[now_I,now_J]:=0;
+      now_J:=now_J+1;
+      hp1:=hp1+30; 
+    end else
+    if (map[now_I,now_J+1] in [3,4,5]) then 
+    begin 
+      if key_num[map[now_I,now_J+1]+3]>0 then 
+      begin 
+        key_num[map[now_I,now_J+1]+3]:=key_num[map[now_I,now_J+1]+3]-1;
+        mt[now_I,now_J+1]:=false;
+        mt[now_I,now_J]:=false;
+        map[now_I,now_J+1]:=1;
+        map[now_I,now_J]:=0;
+        now_J:=now_J+1;
+      end 
+    end else
+    if (map[now_I,now_J+1] in [6,7,8]) then 
+    begin 
+      key_num[map[now_I,now_J+1]]:=key_num[map[now_I,now_J+1]]+1;
+      mt[now_I,now_J+1]:=false;
+      mt[now_I,now_J]:=false;
+      map[now_I,now_J+1]:=1;
+      map[now_I,now_J]:=0;
+      now_J:=now_J+1;
+    end else
+    if (map[now_I,now_J+1] in [81,83]) then up(map[now_I,now_J+1]-80) else
+      if (map[now_I,now_J+1] in [92,94]) then down(map[now_I,now_J+1]-90) else
+        if (map[now_I,now_J+1]=32) then 
+        begin 
+          mt[now_I,now_J+1]:=false;
+          mt[now_I,now_J]:=false;
+          map[now_I,now_J+1]:=1;
+          map[now_I,now_J]:=0;
+          now_J:=now_J+1;
+          Attak1:=Attak1+3;
+        end else
+        if (map[now_I,now_J+1] in [11,12,13,14,15,16,17]) then
+        begin 
+          mt[now_I,now_J+1]:=false;
+          mt[now_I,now_J]:=false;
+          fighting(map[now_I,now_J+1]);
+          map[now_I,now_J+1]:=1;
+          map[now_I,now_J]:=0;
+          now_J:=now_J+1;
+        end;
+  end
+
+  end
+end;
+
+
+procedure init;
+var
+  i,j,k,x:integer;
+begin
+  for i:=1 to 14 do
+  begin
+    for j:=1 to 14 do
+    begin
+        m[1,i,j]:=m1[i,j];
+	m[2,i,j]:=m2[i,j];
+	m[3,i,j]:=m3[i,j];
+	m[4,i,j]:=m4[i,j];
+     end;
+   end;
+end;
+
+procedure prep;
+var 
+  i,j:integer;
+begin
+  HP1:=150;
+  Attak1:=13;
+  Defend1:=10;
+  Money:=0;
+  Exp:=0;
+  Lv:=1;
+
+  now_I:=13; 
+  now_J:=7;
+
+  key_num[6]:=0;
+  key_num[7]:=0;
+  key_num[8]:=0;
+
+  Exp_Need:=5;
+  sword:=false;
+  shield:=false;
+  bok:=false;
+
+  textbackground(black);
+  clrscr;
+  cursoroff;
+  fillchar(map,sizeof(map),0);
+  for i:=1 to 14 do
+    for j:=1 to 14 do
+      map[i,j]:=m[1,i,j];
+end;
+
+procedure work;
+begin
+  while true do
+  begin
+    print;
+    ch:=readkey;
+    if ch='b' then book else
+      if ch='i' then look else
+        if ch='q' then halt else run(ch);
+  end;
+end;
+
+begin
+  init;
+  prep; 
+  work;
+end.
+
+
+
+
+
+
+
