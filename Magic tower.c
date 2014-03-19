@@ -1,26 +1,44 @@
 #include<stdio.h>
+#include<stdlib.h>
 #include<dos.h>
 #include<conio.h>
+
+#define green 2
+#define yellow 14
+#define white 15
+#define red 4
+
+void run(char);
+void prep(void);
+void work(void);
+void look(void);
+void shop(void);
+void quit(void);
+void book(void);
+void print(void);
+void getmap(void);
+void fighting(int);
+void Upstairs(void);
+void Downstairs(void);
 
 int HP1,Attack1,Defend1,Money,Exp,Lv;
 int now_I,now_J;
 int key_num_yellow,key_num_blue,key_num_red;
 int Exp_Need,Sword,Shield,Books;
-int map[16][16][16],now_map[16][16];
-int map1[16][16],map2[16][16],map3[16][16],map4[16][16];
+int checkmap[16][16],now_map[16][16];
+int map[16][16][16],map1[16][16],map2[16][16],map3[16][16],map4[16][16];
 int load_map[16][16][16];
 
 int main(void)
 {
-	init();
+	getmap();
 	prep();
 	work();
 }
 
-void init(void)
+void getmap(void)
 {
-	int i,j;
-	
+	int i,j;	
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++){
 			map[1][i][j] = map1[i][j];
@@ -70,18 +88,42 @@ void work(void)
 		bioskey(0);
 		if (ch == 'b') book();
 			else if (ch == 'i') look(); 
-				else if (ch == 'q') exit();
+				else if (ch == 'q') quit();
 					else run(ch);
 	}
 }
+
+void look(void)
+{
+}
+
+void shop(void)
+{
+}
+
+void book(void)
+{
+}
+
+void fighting(int monster)
+{
+}
+
+void Upstairs(void)
+{
+}
+
+void Downstairs(void)
+{}
 
 void run(char ch)
 {
 	if (ch == 'w'){
 		switch (now_map[now_I-1][now_J]){
-			case 1,2:
-				map[now_I-1][now_J] = false;
-				map[now_I  ][now_J] = false;
+			case 1:
+			case 2:
+				checkmap[now_I-1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
@@ -90,8 +132,8 @@ void run(char ch)
 				if (key_num_yellow > 0)
 				{
 					key_num_yellow--;
-					map[now_I-1][now_J] = false;
-					map[now_I  ][now_J] = false;
+					checkmap[now_I-1][now_J] = 0;
+					checkmap[now_I  ][now_J] = 0;
 					now_map[now_I-1][now_J] = 1;
 					now_map[now_I  ][now_J] = 0;
 					now_I--; 
@@ -101,8 +143,8 @@ void run(char ch)
 				if (key_num_blue > 0)
 				{
 					key_num_blue--;
-					map[now_I-1][now_J] = false;
-					map[now_I  ][now_J] = false;
+					checkmap[now_I-1][now_J] = 0;
+					checkmap[now_I  ][now_J] = 0;
 					now_map[now_I-1][now_J] = 1;
 					now_map[now_I  ][now_J] = 0;
 					now_I--; 
@@ -112,8 +154,8 @@ void run(char ch)
 				if (key_num_red > 0)
 				{
 					key_num_red--;
-					map[now_I-1][now_J] = false;
-					map[now_I  ][now_J] = false;
+					checkmap[now_I-1][now_J] = 0;
+					checkmap[now_I  ][now_J] = 0;
 					now_map[now_I-1][now_J] = 1;
 					now_map[now_I  ][now_J] = 0;
 					now_I--; 
@@ -121,76 +163,82 @@ void run(char ch)
 				break;
 			case 6:
 				key_num_yellow++;
-				map[now_I-1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I-1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--; 
 				break;
 			case 7:
 				key_num_blue++;
-				map[now_I-1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I-1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--; 
 				break;
 			case 8:
 				key_num_red++;
-				map[now_I-1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I-1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--; 
 				break;
-			case 11,12,13,14,15,16,17:
-				map[now_I-1][now_J] = false;
-				map[now_I  ][now_J] = false;
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+			case 15:
+			case 16:
+			case 17:
+				checkmap[now_I-1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
                 fighting(now_map[now_I-1][now_J]);
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--; 
 				break;
 			case 30:
-				map[now_I-1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I-1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
-				Hp1+=30;
+				HP1+=30;
 				break;	
 			case 31:
-				map[now_I-1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I-1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
-				Sword = true;
+				Sword = 1;
                 Attack1+=10;
 				break;
 			case 32:
-				map[now_I-1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I-1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
                 Attack1+=3;
 				break;
 			case 33:
-				map[now_I-1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I-1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
                 Defend1+=8;
 				break;
 			case 35:
-				map[now_I-1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I-1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
-                Books = true;
+                Books = 1;
 				break;
 			case 51:
 				shop();
@@ -205,9 +253,10 @@ void run(char ch)
 	};
 	if (ch == 's'){
 		switch (now_map[now_I+1][now_J]){
-			case 1,2:
-				map[now_I+1][now_J] = false;
-				map[now_I  ][now_J] = false;
+			case 1:
+			case 2:
+				checkmap[now_I+1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
@@ -216,8 +265,8 @@ void run(char ch)
 				if (key_num_yellow > 0)
 				{
 					key_num_yellow--;
-					map[now_I+1][now_J] = false;
-					map[now_I  ][now_J] = false;
+					checkmap[now_I+1][now_J] = 0;
+					checkmap[now_I  ][now_J] = 0;
 					now_map[now_I+1][now_J] = 1;
 					now_map[now_I  ][now_J] = 0;
 					now_I++; 
@@ -227,8 +276,8 @@ void run(char ch)
 				if (key_num_blue > 0)
 				{
 					key_num_blue--;
-					map[now_I+1][now_J] = false;
-					map[now_I  ][now_J] = false;
+					checkmap[now_I+1][now_J] = 0;
+					checkmap[now_I  ][now_J] = 0;
 					now_map[now_I+1][now_J] = 1;
 					now_map[now_I  ][now_J] = 0;
 					now_I++; 
@@ -238,8 +287,8 @@ void run(char ch)
 				if (key_num_red > 0)
 				{
 					key_num_red--;
-					map[now_I+1][now_J] = false;
-					map[now_I  ][now_J] = false;
+					checkmap[now_I+1][now_J] = 0;
+					checkmap[now_I  ][now_J] = 0;
 					now_map[now_I+1][now_J] = 1;
 					now_map[now_I  ][now_J] = 0;
 					now_I++; 
@@ -247,76 +296,82 @@ void run(char ch)
 				break;
 			case 6:
 				key_num_yellow++;
-				map[now_I+1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I+1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++; 
 				break;
 			case 7:
 				key_num_blue++;
-				map[now_I+1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I+1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++; 
 				break;
 			case 8:
 				key_num_red++;
-				map[now_I+1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I+1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++; 
 				break;
-			case 11,12,13,14,15,16,17:
-				map[now_I+1][now_J] = false;
-				map[now_I  ][now_J] = false;
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+			case 15:
+			case 16:
+			case 17:
+				checkmap[now_I+1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
                 fighting(now_map[now_I+1][now_J]);
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++; 
 				break;
 			case 30:
-				map[now_I+1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I+1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
-				Hp1+=30;
+				HP1+=30;
 				break;
 			case 31:
-				map[now_I+1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I+1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
-				Sword = true;
+				Sword = 1;
                 Attack1+=10;
 				break;
 			case 32:
-				map[now_I+1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I+1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
                 Attack1+=3;
 				break;
 			case 33:
-				map[now_I+1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I+1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
                 Defend1+=8;
 				break;
 			case 35:
-				map[now_I+1][now_J] = false;
-				map[now_I  ][now_J] = false;
+				checkmap[now_I+1][now_J] = 0;
+				checkmap[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
-                Books = true;
+                Books = 1;
 				break;
 			case 51:
 				shop();
@@ -331,9 +386,10 @@ void run(char ch)
 	};
 	if (ch == 'a'){
 		switch (now_map[now_I][now_J-1]){
-			case 1,2:
-				map[now_I][now_J-1] = false;
-				map[now_I][now_J  ] = false;
+			case 1:
+			case 2:
+				checkmap[now_I][now_J-1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
@@ -342,8 +398,8 @@ void run(char ch)
 				if (key_num_yellow > 0)
 				{
 					key_num_yellow--;
-					map[now_I][now_J-1] = false;
-					map[now_I][now_J  ] = false;
+					checkmap[now_I][now_J-1] = 0;
+					checkmap[now_I][now_J  ] = 0;
 					now_map[now_I][now_J-1] = 1;
 					now_map[now_I][now_J  ] = 0;
 					now_J--;
@@ -353,8 +409,8 @@ void run(char ch)
 				if (key_num_blue > 0)
 				{
 					key_num_blue--;
-					map[now_I][now_J-1] = false;
-					map[now_I][now_J  ] = false;
+					checkmap[now_I][now_J-1] = 0;
+					checkmap[now_I][now_J  ] = 0;
 					now_map[now_I][now_J-1] = 1;
 					now_map[now_I][now_J  ] = 0;
 					now_J--;
@@ -364,8 +420,8 @@ void run(char ch)
 				if (key_num_red > 0)
 				{
 					key_num_red--;
-					map[now_I][now_J-1] = false;
-					map[now_I][now_J  ] = false;
+					checkmap[now_I][now_J-1] = 0;
+					checkmap[now_I][now_J  ] = 0;
 					now_map[now_I][now_J-1] = 1;
 					now_map[now_I][now_J  ] = 0;
 					now_J--;
@@ -373,76 +429,82 @@ void run(char ch)
 				break;
 			case 6:
 				key_num_yellow++;
-				map[now_I][now_J-1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J-1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
 				break;
 			case 7:
 				key_num_blue++;
-				map[now_I][now_J-1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J-1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
 				break;
 			case 8:
 				key_num_red++;
-				map[now_I][now_J-1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J-1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
 				break;
-			case 11,12,13,14,15,16,17:
-				map[now_I][now_J-1] = false;
-				map[now_I][now_J  ] = false;
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+			case 15:
+			case 16:
+			case 17:
+				checkmap[now_I][now_J-1] = 0;
+				checkmap[now_I][now_J  ] = 0;
                 fighting(now_map[now_I][now_J-1]);
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
 				break;
 			case 30:
-				map[now_I][now_J-1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J-1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
-				Hp1+=30;
+				HP1+=30;
 				break;
 			case 31:
-				map[now_I][now_J-1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J-1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
-				Sword = true;
+				Sword = 1;
                 Attack1+=10;
 				break;
 			case 32:
-				map[now_I][now_J-1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J-1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
                 Attack1+=3;
 				break;
 			case 33:
-				map[now_I][now_J-1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J-1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
                 Defend1+=8;
 				break;
 			case 35:
-				map[now_I][now_J-1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J-1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
-                Books = true;
+                Books = 1;
 				break;
 			case 51:
 				shop();
@@ -454,12 +516,13 @@ void run(char ch)
 				Downstairs();	
 				break;
 		}
-	}£»
+	}
 	if (ch == 'd'){
 		switch (now_map[now_I][now_J+1]){
-			case 1,2:
-				map[now_I][now_J+1] = false;
-				map[now_I][now_J  ] = false;
+			case 1:
+			case 2:
+				checkmap[now_I][now_J+1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
@@ -468,8 +531,8 @@ void run(char ch)
 				if (key_num_yellow > 0)
 				{
 					key_num_yellow--;
-					map[now_I][now_J+1] = false;
-					map[now_I][now_J  ] = false;
+					checkmap[now_I][now_J+1] = 0;
+					checkmap[now_I][now_J  ] = 0;
 					now_map[now_I][now_J+1] = 1;
 					now_map[now_I][now_J  ] = 0;
 					now_J++;
@@ -479,8 +542,8 @@ void run(char ch)
 				if (key_num_blue > 0)
 				{
 					key_num_blue--;
-					map[now_I][now_J+1] = false;
-					map[now_I][now_J  ] = false;
+					checkmap[now_I][now_J+1] = 0;
+					checkmap[now_I][now_J  ] = 0;
 					now_map[now_I][now_J+1] = 1;
 					now_map[now_I][now_J  ] = 0;
 					now_J++;
@@ -490,8 +553,8 @@ void run(char ch)
 				if (key_num_red > 0)
 				{
 					key_num_red--;
-					map[now_I][now_J+1] = false;
-					map[now_I][now_J  ] = false;
+					checkmap[now_I][now_J+1] = 0;
+					checkmap[now_I][now_J  ] = 0;
 					now_map[now_I][now_J+1] = 1;
 					now_map[now_I][now_J  ] = 0;
 					now_J++;
@@ -499,76 +562,82 @@ void run(char ch)
 				break;
 			case 6:
 				key_num_yellow++;
-				map[now_I][now_J+1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J+1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
 				break;
 			case 7:
 				key_num_blue++;
-				map[now_I][now_J+1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J+1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
 				break;
 			case 8:
 				key_num_red++;
-				map[now_I][now_J+1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J+1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
 				break;
-			case 11,12,13,14,15,16,17:
-				map[now_I][now_J+1] = false;
-				map[now_I][now_J  ] = false;
+			case 11:
+			case 12:
+			case 13:
+			case 14:
+			case 15:
+			case 16:
+			case 17:
+				checkmap[now_I][now_J+1] = 0;
+				checkmap[now_I][now_J  ] = 0;
                 fighting(now_map[now_I][now_J+1]);
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
 				break;
 			case 30:
-				map[now_I][now_J+1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J+1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
-				Hp1+=30;
+				HP1+=30;
 				break;
 			case 31:
-				map[now_I][now_J+1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J+1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
-				Sword = true;
+				Sword = 1;
                 Attack1+=10;
 				break;
 			case 32:
-				map[now_I][now_J+1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J+1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
                 Attack1+=3;
 				break;
 			case 33:
-				map[now_I][now_J+1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J+1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
                 Defend1+=8;
 				break;
 			case 35:
-				map[now_I][now_J+1] = false;
-				map[now_I][now_J  ] = false;
+				checkmap[now_I][now_J+1] = 0;
+				checkmap[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
-                Books = true;
+                Books = 1;
 				break;
 			case 51:
 				shop();
@@ -585,154 +654,160 @@ void run(char ch)
 
 void print(void)
 {
-	for (int i=1; i<=14; i++)
-		for (int j=1; j<=14; j++)
-			if (!map[i][j]){
+	int i, j;
+	for (i=1; i<=14; i++)
+		for (j=1; j<=14; j++)
+			if (!checkmap[i][j]){
 				switch (now_map[i][j]){
 					case 0:
-						gotoxy(j*5,i*3  );	printf('     ');
-						gotoxy(j*5,i*3+1);	printf('     ');
-						gotoxy(j*5,i*3+2);	printf('     ');
+						gotoxy(j*5,i*3  );	printf("     ");
+						gotoxy(j*5,i*3+1);	printf("     ");
+						gotoxy(j*5,i*3+2);	printf("     ");
 						break;
 					case 1:
 						textcolor(yellow);
-						gotoxy(j*5,i*3  );	printf(' ^^^ ');
-						gotoxy(j*5,i*3+1);	printf('|o o|');
-						gotoxy(j*5,i*3+2);	printf('\_v_/');
+						gotoxy(j*5,i*3  );	printf(" ^^^ ");
+						gotoxy(j*5,i*3+1);	printf("|o o|");
+						gotoxy(j*5,i*3+2);	printf("\\_v_/");
 						break;
 					case 2:
 						textcolor(white);
-						gotoxy(j*5,i*3  );	printf('#####');
-						gotoxy(j*5,i*3+1);	printf('#####');
-						gotoxy(j*5,i*3+2);	printf('#####');
+						gotoxy(j*5,i*3  );	printf("#####");
+						gotoxy(j*5,i*3+1);	printf("#####");
+						gotoxy(j*5,i*3+2);	printf("#####");
 						break;
-					case 3,4,5:
+					case 3:
+					case 4:
+					case 5:
 						if (now_map[i][j] == 3) textcolor(yellow);
 							else if (now_map[i][j] == 4) textcolor(123);
 								else if (now_map[i][j] == 5) textcolor(red); 
-						gotoxy(j*5,i*3  );	printf(' --- ');
-						gotoxy(j*5,i*3+1);	printf('/***\');
-						gotoxy(j*5,i*3+2);	printf('|***|');
+						gotoxy(j*5,i*3  );	printf(" --- ");
+						gotoxy(j*5,i*3+1);	printf("/***\\");
+						gotoxy(j*5,i*3+2);	printf("|***|");
 						break;
-					case 6,7,8:
+					case 6:
+					case 7:
+					case 8:
 						if (now_map[i][j] == 6) textcolor(yellow);
 							else if (now_map[i][j] == 7) textcolor(123);
 								else if (now_map[i][j] == 8) textcolor(red); 
-						gotoxy(j*5,i*3  );	printf(' {O} ');
-						gotoxy(j*5,i*3+1);	printf('  H  ');
-						gotoxy(j*5,i*3+2);	printf('  F  ');
+						gotoxy(j*5,i*3  );	printf(" {O} ");
+						gotoxy(j*5,i*3+1);	printf("  H  ");
+						gotoxy(j*5,i*3+2);	printf("  F  ");
 						break;
 					case 11:
 						textcolor(5);
-						gotoxy(j*5,i*3  );	printf(' --- ');
-						gotoxy(j*5,i*3+1);	printf('|o o|');
-						gotoxy(j*5,i*3+2);	printf('|___|');
+						gotoxy(j*5,i*3  );	printf(" --- ");
+						gotoxy(j*5,i*3+1);	printf("|o o|");
+						gotoxy(j*5,i*3+2);	printf("|___|");
 						break;
 					case 12:
 						textcolor(5);
-						gotoxy(j*5,i*3  );	printf(' --- ');
-						gotoxy(j*5,i*3+1);	printf('|o o|');
-						gotoxy(j*5,i*3+2);	printf('\_o_/');
+						gotoxy(j*5,i*3  );	printf(" --- ");
+						gotoxy(j*5,i*3+1);	printf("|o o|");
+						gotoxy(j*5,i*3+2);	printf("\\_o_/");
 						break;
 					case 13:
 						textcolor(5);
-						gotoxy(j*5,i*3  );	printf(' === ');
-						gotoxy(j*5,i*3+1);	printf('(o o)');
-						gotoxy(j*5,i*3+2);	printf('\_^_/');
+						gotoxy(j*5,i*3  );	printf(" === ");
+						gotoxy(j*5,i*3+1);	printf("(o o)");
+						gotoxy(j*5,i*3+2);	printf("\\_^_/");
 						break;
 					case 14:
 						textcolor(5);
-						gotoxy(j*5,i*3  );	printf('/---\');
-						gotoxy(j*5,i*3+1);	printf('|o o|');
-						gotoxy(j*5,i*3+2);	printf('v^^^v');
+						gotoxy(j*5,i*3  );	printf("/---\\");
+						gotoxy(j*5,i*3+1);	printf("|o o|");
+						gotoxy(j*5,i*3+2);	printf("v^^^v");
 						break;
 					case 15:
 						textcolor(5);
-						gotoxy(j*5,i*3  );	printf(' \^/ ');
-						gotoxy(j*5,i*3+1);	printf('<o o>');
-						gotoxy(j*5,i*3+2);	printf('V\x/V');
+						gotoxy(j*5,i*3  );	printf(" \\^/ ");
+						gotoxy(j*5,i*3+1);	printf("<o o>");
+						gotoxy(j*5,i*3+2);	printf("V\\x/V");
 						break;
 					case 16:
 						textcolor(5);
-						gotoxy(j*5,i*3  );	printf('UUUUU');
-						gotoxy(j*5,i*3+1);	printf('|o o|');
-						gotoxy(j*5,i*3+2);	printf('-----');
+						gotoxy(j*5,i*3  );	printf("UUUUU");
+						gotoxy(j*5,i*3+1);	printf("|o o|");
+						gotoxy(j*5,i*3+2);	printf("-----");
 						break;
 					case 17:
 						textcolor(5);
-						gotoxy(j*5,i*3  );	printf('Y M Y');
-						gotoxy(j*5,i*3+1);	printf('[o o]');
-						gotoxy(j*5,i*3+2);	printf('XXXXX');
+						gotoxy(j*5,i*3  );	printf("Y M Y");
+						gotoxy(j*5,i*3+1);	printf("[o o]");
+						gotoxy(j*5,i*3+2);	printf("XXXXX");
 						break;
 					case 30:
 						textcolor(green);
-						gotoxy(j*5,i*3  );	printf(' || H');
-						gotoxy(j*5,i*3+1);	printf('/==\ ');
-						gotoxy(j*5,i*3+2);	printf('\==/ ');
+						gotoxy(j*5,i*3  );	printf(" || H");
+						gotoxy(j*5,i*3+1);	printf("/==\\ ");
+						gotoxy(j*5,i*3+2);	printf("\\==/ ");
 						break;
 					case 31:
 						textcolor(green);
-						gotoxy(j*5,i*3  );	printf(' A  G');
-						gotoxy(j*5,i*3+1);	printf(' H  +');
-						gotoxy(j*5,i*3+2);	printf('<H> +');
+						gotoxy(j*5,i*3  );	printf(" A  G");
+						gotoxy(j*5,i*3+1);	printf(" H  +");
+						gotoxy(j*5,i*3+2);	printf("<H> +");
 						break;
 					case 32:
 						textcolor(green);
-						gotoxy(j*5,i*3  );	printf('     ');
-						gotoxy(j*5,i*3+1);	printf('     ');
-						gotoxy(j*5,i*3+2);	printf(' +3  ');
+						gotoxy(j*5,i*3  );	printf("     ");
+						gotoxy(j*5,i*3+1);	printf("     ");
+						gotoxy(j*5,i*3+2);	printf(" +3  ");
 						break;
 					case 33:
 						textcolor(green);
-						gotoxy(j*5,i*3  );	printf('___ F');
-						gotoxy(j*5,i*3+1);	printf('|x| +');
-						gotoxy(j*5,i*3+2);	printf('\_/ +');
+						gotoxy(j*5,i*3  );	printf("___ F");
+						gotoxy(j*5,i*3+1);	printf("|x| +");
+						gotoxy(j*5,i*3+2);	printf("\\_/ +");
 						break;
 					case 35:
 						textcolor(green);
-						gotoxy(j*5,i*3  );	printf('c===c ');
-						gotoxy(j*5,i*3+1);	printf('c   |');
-						gotoxy(j*5,i*3+2);	printf('c___|');
+						gotoxy(j*5,i*3  );	printf("c===c");
+						gotoxy(j*5,i*3+1);	printf("c ~ |");
+						gotoxy(j*5,i*3+2);	printf("c___|");
 						break;
 					case 50:
 						textcolor(green);
-						gotoxy(j*5,i*3  );	printf('/====');
-						gotoxy(j*5,i*3+1);	printf('|shop');
-						gotoxy(j*5,i*3+2);	printf('|____');
+						gotoxy(j*5,i*3  );	printf("/====");
+						gotoxy(j*5,i*3+1);	printf("|shop");
+						gotoxy(j*5,i*3+2);	printf("|____");
 						break;
 					case 51:
 						textcolor(green);
-						gotoxy(j*5,i*3  );	printf('=====');
-						gotoxy(j*5,i*3+1);	printf(' ___ ');
-						gotoxy(j*5,i*3+2);	printf('|___|');
+						gotoxy(j*5,i*3  );	printf("=====");
+						gotoxy(j*5,i*3+1);	printf(" ___ ");
+						gotoxy(j*5,i*3+2);	printf("|___|");
 						break;
 					case 52:
 						textcolor(green);
-						gotoxy(j*5,i*3  );	printf('====\');
-						gotoxy(j*5,i*3+1);	printf('shop|');
-						gotoxy(j*5,i*3+2);	printf('____|');
+						gotoxy(j*5,i*3  );	printf("====\\");
+						gotoxy(j*5,i*3+1);	printf("shop|");
+						gotoxy(j*5,i*3+2);	printf("____|");
 						break;
 					case 80:
 						textcolor(red);
-						gotoxy(j*5,i*3  );	printf('^ ^ ^');
-						gotoxy(j*5,i*3+1);	printf('| | |');
-						gotoxy(j*5,i*3+2);	printf('| | |');
+						gotoxy(j*5,i*3  );	printf("^ ^ ^");
+						gotoxy(j*5,i*3+1);	printf("| | |");
+						gotoxy(j*5,i*3+2);	printf("| | |");
 						break; 
 					case 90:
-						textcolor(red)
-						gotoxy(j*5,i*3  );	printf('| | |');
-						gotoxy(j*5,i*3+1);	printf('| | |');
-						gotoxy(j*5,i*3+2);	printf('v v v');
+						textcolor(red);
+						gotoxy(j*5,i*3  );	printf("| | |");
+						gotoxy(j*5,i*3+1);	printf("| | |");
+						gotoxy(j*5,i*3+2);	printf("v v v");
 				}
 			}
-	memset(map,true,sizeof(map));
+	memset(checkmap,1,sizeof(checkmap));
 } 
 
 void quit(void)
 {
-	for (int i=1; i<=14; i++)
-		for (int j=1; j<=14; j++)
-			map[i][j] = false;
+	int i, j;
+	for (i=1; i<=14; i++)
+		for (j=1; j<=14; j++)
+			checkmap[i][j] = 0;
 	clrscr();
-	print;
+	print();
 }
