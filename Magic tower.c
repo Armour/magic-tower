@@ -18,15 +18,16 @@ void book(void);
 void print(void);
 void getmap(void);
 void fighting(int);
+void defeated(void);
 void Upstairs(void);
 void Downstairs(void);
 
-int HP1,Attack1,Defend1,Money,Exp,Lv;
-int now_I,now_J;
-int key_num_yellow,key_num_blue,key_num_red;
-int Exp_Need,Sword,Shield,Books;
-int checkmap[16][16],now_map[16][16];
-int map[16][16][16],map1[16][16],map2[16][16],map3[16][16],map4[16][16];
+int HP1, Attack1, Defend1, Money, Exp, Lv;
+int now_I, now_J, now_floor;
+int key_num_yellow, key_num_blue, key_num_red;
+int Exp_Need, Sword, Shield, Books;
+int checkmap[16][16], now_map[16][16];
+int map[16][16][16], map1[16][16], map2[16][16], map3[16][16], map4[16][16];
 int load_map[16][16][16];
 
 int main(void)
@@ -61,6 +62,7 @@ void prep(void)
 
 	now_I   = 13;
 	now_J   = 7;
+	now_floor = 1;
 	
 	key_num_yellow = 0;
 	key_num_blue   = 0;
@@ -109,12 +111,42 @@ void fighting(int monster)
 {
 }
 
+void defeated(void)
+{
+	clrscr();
+	gotoxy(32,20);
+	printf("You Lost .... TAT\n");
+	getchar();
+	exit(0);
+}
+
 void Upstairs(void)
 {
+	int i, j;
+	clrscr();
+	for (i=1; i<=14; i++)
+		for (j=1; j<=14; j++){
+			map[now_floor][i][j] = now_map[i][j];
+			now_map[i][j] = map [now_floor+1][i][j] ;
+			checkmap[i][j] = 0;
+		}
+	now_floor++; 
+	print();
 }
 
 void Downstairs(void)
-{}
+{
+	int i, j;
+	clrscr();
+	for (i=1; i<=14; i++)
+		for (j=1; j<=14; j++){
+			map[now_floor][i][j] = now_map[i][j];
+			now_map[i][j] = map [now_floor-1][i][j] ;
+			checkmap[i][j] = 0;
+		}
+	now_floor--; 
+	print();
+}
 
 void run(char ch)
 {
