@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<dos.h>
 #include<conio.h>
+#include"graphics.h" 
 
 #define green 2
 #define yellow 14
@@ -9,6 +10,7 @@
 #define red 4
 
 void run(char);
+void init(void);
 void prep(void);
 void work(void);
 void look(void);
@@ -16,7 +18,6 @@ void shop(void);
 void quit(void);
 void book(void);
 void print(void);
-void getmap(void);
 void fighting(int);
 void defeated(void);
 void Upstairs(void);
@@ -26,27 +27,26 @@ int HP1, Attack1, Defend1, Money, Exp, Lv;
 int now_I, now_J, now_floor;
 int key_num_yellow, key_num_blue, key_num_red;
 int Exp_Need, Sword, Shield, Books;
-int checkmap[16][16], now_map[16][16];
-int map[16][16][16], map1[16][16], map2[16][16], map3[16][16], map4[16][16];
-int load_map[16][16][16];
+int check_map[16][16], now_map[16][16], map[5][16][16];
 
 int main(void)
 {
-	getmap();
+	init();
 	prep();
 	work();
+	return 0;
 }
 
-void getmap(void)
+void init(void)
 {
-	int i,j;	
-	for (i=1; i<=14; i++)
-		for (j=1; j<=14; j++){
-			map[1][i][j] = map1[i][j];
-			map[2][i][j] = map2[i][j];
-			map[3][i][j] = map3[i][j];
-			map[4][i][j] = map4[i][j];
-		}
+	int i, j, t;	
+	FILE *fp;
+	fp = fopen("map.txt","r");
+	for (t=1; t<=4; t++)
+		for (i=1; i<=14; i++)
+			for (j=1; j<=14; j++)
+				fscanf(fp,"%d",&map[t][i][j]);
+	fclose(fp);
 }
 
 void prep(void)
@@ -77,9 +77,10 @@ void prep(void)
 	clrscr();
 	//cursoroff;
 	memset(now_map,0,sizeof(now_map));
+	memset(check_map,0,sizeof(check_map));
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
-			now_map[i][j] = load_map[1][i][j];
+			now_map[i][j] = map[1][i][j];
 }
 
 void work(void)
@@ -128,7 +129,7 @@ void Upstairs(void)
 		for (j=1; j<=14; j++){
 			map[now_floor][i][j] = now_map[i][j];
 			now_map[i][j] = map [now_floor+1][i][j] ;
-			checkmap[i][j] = 0;
+			check_map[i][j] = 0;
 		}
 	now_floor++; 
 	print();
@@ -142,7 +143,7 @@ void Downstairs(void)
 		for (j=1; j<=14; j++){
 			map[now_floor][i][j] = now_map[i][j];
 			now_map[i][j] = map [now_floor-1][i][j] ;
-			checkmap[i][j] = 0;
+			check_map[i][j] = 0;
 		}
 	now_floor--; 
 	print();
@@ -154,8 +155,8 @@ void run(char ch)
 		switch (now_map[now_I-1][now_J]){
 			case 1:
 			case 2:
-				checkmap[now_I-1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I-1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
@@ -164,8 +165,8 @@ void run(char ch)
 				if (key_num_yellow > 0)
 				{
 					key_num_yellow--;
-					checkmap[now_I-1][now_J] = 0;
-					checkmap[now_I  ][now_J] = 0;
+					check_map[now_I-1][now_J] = 0;
+					check_map[now_I  ][now_J] = 0;
 					now_map[now_I-1][now_J] = 1;
 					now_map[now_I  ][now_J] = 0;
 					now_I--; 
@@ -175,8 +176,8 @@ void run(char ch)
 				if (key_num_blue > 0)
 				{
 					key_num_blue--;
-					checkmap[now_I-1][now_J] = 0;
-					checkmap[now_I  ][now_J] = 0;
+					check_map[now_I-1][now_J] = 0;
+					check_map[now_I  ][now_J] = 0;
 					now_map[now_I-1][now_J] = 1;
 					now_map[now_I  ][now_J] = 0;
 					now_I--; 
@@ -186,8 +187,8 @@ void run(char ch)
 				if (key_num_red > 0)
 				{
 					key_num_red--;
-					checkmap[now_I-1][now_J] = 0;
-					checkmap[now_I  ][now_J] = 0;
+					check_map[now_I-1][now_J] = 0;
+					check_map[now_I  ][now_J] = 0;
 					now_map[now_I-1][now_J] = 1;
 					now_map[now_I  ][now_J] = 0;
 					now_I--; 
@@ -195,24 +196,24 @@ void run(char ch)
 				break;
 			case 6:
 				key_num_yellow++;
-				checkmap[now_I-1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I-1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--; 
 				break;
 			case 7:
 				key_num_blue++;
-				checkmap[now_I-1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I-1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--; 
 				break;
 			case 8:
 				key_num_red++;
-				checkmap[now_I-1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I-1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--; 
@@ -224,24 +225,24 @@ void run(char ch)
 			case 15:
 			case 16:
 			case 17:
-				checkmap[now_I-1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I-1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
                 fighting(now_map[now_I-1][now_J]);
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--; 
 				break;
 			case 30:
-				checkmap[now_I-1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I-1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
 				HP1+=30;
 				break;	
 			case 31:
-				checkmap[now_I-1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I-1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
@@ -249,24 +250,24 @@ void run(char ch)
                 Attack1+=10;
 				break;
 			case 32:
-				checkmap[now_I-1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I-1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
                 Attack1+=3;
 				break;
 			case 33:
-				checkmap[now_I-1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I-1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
                 Defend1+=8;
 				break;
 			case 35:
-				checkmap[now_I-1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I-1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
@@ -287,8 +288,8 @@ void run(char ch)
 		switch (now_map[now_I+1][now_J]){
 			case 1:
 			case 2:
-				checkmap[now_I+1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I+1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
@@ -297,8 +298,8 @@ void run(char ch)
 				if (key_num_yellow > 0)
 				{
 					key_num_yellow--;
-					checkmap[now_I+1][now_J] = 0;
-					checkmap[now_I  ][now_J] = 0;
+					check_map[now_I+1][now_J] = 0;
+					check_map[now_I  ][now_J] = 0;
 					now_map[now_I+1][now_J] = 1;
 					now_map[now_I  ][now_J] = 0;
 					now_I++; 
@@ -308,8 +309,8 @@ void run(char ch)
 				if (key_num_blue > 0)
 				{
 					key_num_blue--;
-					checkmap[now_I+1][now_J] = 0;
-					checkmap[now_I  ][now_J] = 0;
+					check_map[now_I+1][now_J] = 0;
+					check_map[now_I  ][now_J] = 0;
 					now_map[now_I+1][now_J] = 1;
 					now_map[now_I  ][now_J] = 0;
 					now_I++; 
@@ -319,8 +320,8 @@ void run(char ch)
 				if (key_num_red > 0)
 				{
 					key_num_red--;
-					checkmap[now_I+1][now_J] = 0;
-					checkmap[now_I  ][now_J] = 0;
+					check_map[now_I+1][now_J] = 0;
+					check_map[now_I  ][now_J] = 0;
 					now_map[now_I+1][now_J] = 1;
 					now_map[now_I  ][now_J] = 0;
 					now_I++; 
@@ -328,24 +329,24 @@ void run(char ch)
 				break;
 			case 6:
 				key_num_yellow++;
-				checkmap[now_I+1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I+1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++; 
 				break;
 			case 7:
 				key_num_blue++;
-				checkmap[now_I+1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I+1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++; 
 				break;
 			case 8:
 				key_num_red++;
-				checkmap[now_I+1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I+1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++; 
@@ -357,24 +358,24 @@ void run(char ch)
 			case 15:
 			case 16:
 			case 17:
-				checkmap[now_I+1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I+1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
                 fighting(now_map[now_I+1][now_J]);
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++; 
 				break;
 			case 30:
-				checkmap[now_I+1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I+1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
 				HP1+=30;
 				break;
 			case 31:
-				checkmap[now_I+1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I+1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
@@ -382,24 +383,24 @@ void run(char ch)
                 Attack1+=10;
 				break;
 			case 32:
-				checkmap[now_I+1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I+1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
                 Attack1+=3;
 				break;
 			case 33:
-				checkmap[now_I+1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I+1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
                 Defend1+=8;
 				break;
 			case 35:
-				checkmap[now_I+1][now_J] = 0;
-				checkmap[now_I  ][now_J] = 0;
+				check_map[now_I+1][now_J] = 0;
+				check_map[now_I  ][now_J] = 0;
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
@@ -420,8 +421,8 @@ void run(char ch)
 		switch (now_map[now_I][now_J-1]){
 			case 1:
 			case 2:
-				checkmap[now_I][now_J-1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J-1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
@@ -430,8 +431,8 @@ void run(char ch)
 				if (key_num_yellow > 0)
 				{
 					key_num_yellow--;
-					checkmap[now_I][now_J-1] = 0;
-					checkmap[now_I][now_J  ] = 0;
+					check_map[now_I][now_J-1] = 0;
+					check_map[now_I][now_J  ] = 0;
 					now_map[now_I][now_J-1] = 1;
 					now_map[now_I][now_J  ] = 0;
 					now_J--;
@@ -441,8 +442,8 @@ void run(char ch)
 				if (key_num_blue > 0)
 				{
 					key_num_blue--;
-					checkmap[now_I][now_J-1] = 0;
-					checkmap[now_I][now_J  ] = 0;
+					check_map[now_I][now_J-1] = 0;
+					check_map[now_I][now_J  ] = 0;
 					now_map[now_I][now_J-1] = 1;
 					now_map[now_I][now_J  ] = 0;
 					now_J--;
@@ -452,8 +453,8 @@ void run(char ch)
 				if (key_num_red > 0)
 				{
 					key_num_red--;
-					checkmap[now_I][now_J-1] = 0;
-					checkmap[now_I][now_J  ] = 0;
+					check_map[now_I][now_J-1] = 0;
+					check_map[now_I][now_J  ] = 0;
 					now_map[now_I][now_J-1] = 1;
 					now_map[now_I][now_J  ] = 0;
 					now_J--;
@@ -461,24 +462,24 @@ void run(char ch)
 				break;
 			case 6:
 				key_num_yellow++;
-				checkmap[now_I][now_J-1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J-1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
 				break;
 			case 7:
 				key_num_blue++;
-				checkmap[now_I][now_J-1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J-1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
 				break;
 			case 8:
 				key_num_red++;
-				checkmap[now_I][now_J-1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J-1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
@@ -490,24 +491,24 @@ void run(char ch)
 			case 15:
 			case 16:
 			case 17:
-				checkmap[now_I][now_J-1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J-1] = 0;
+				check_map[now_I][now_J  ] = 0;
                 fighting(now_map[now_I][now_J-1]);
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
 				break;
 			case 30:
-				checkmap[now_I][now_J-1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J-1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
 				HP1+=30;
 				break;
 			case 31:
-				checkmap[now_I][now_J-1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J-1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
@@ -515,24 +516,24 @@ void run(char ch)
                 Attack1+=10;
 				break;
 			case 32:
-				checkmap[now_I][now_J-1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J-1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
                 Attack1+=3;
 				break;
 			case 33:
-				checkmap[now_I][now_J-1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J-1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
                 Defend1+=8;
 				break;
 			case 35:
-				checkmap[now_I][now_J-1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J-1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
@@ -553,8 +554,8 @@ void run(char ch)
 		switch (now_map[now_I][now_J+1]){
 			case 1:
 			case 2:
-				checkmap[now_I][now_J+1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J+1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
@@ -563,8 +564,8 @@ void run(char ch)
 				if (key_num_yellow > 0)
 				{
 					key_num_yellow--;
-					checkmap[now_I][now_J+1] = 0;
-					checkmap[now_I][now_J  ] = 0;
+					check_map[now_I][now_J+1] = 0;
+					check_map[now_I][now_J  ] = 0;
 					now_map[now_I][now_J+1] = 1;
 					now_map[now_I][now_J  ] = 0;
 					now_J++;
@@ -574,8 +575,8 @@ void run(char ch)
 				if (key_num_blue > 0)
 				{
 					key_num_blue--;
-					checkmap[now_I][now_J+1] = 0;
-					checkmap[now_I][now_J  ] = 0;
+					check_map[now_I][now_J+1] = 0;
+					check_map[now_I][now_J  ] = 0;
 					now_map[now_I][now_J+1] = 1;
 					now_map[now_I][now_J  ] = 0;
 					now_J++;
@@ -585,8 +586,8 @@ void run(char ch)
 				if (key_num_red > 0)
 				{
 					key_num_red--;
-					checkmap[now_I][now_J+1] = 0;
-					checkmap[now_I][now_J  ] = 0;
+					check_map[now_I][now_J+1] = 0;
+					check_map[now_I][now_J  ] = 0;
 					now_map[now_I][now_J+1] = 1;
 					now_map[now_I][now_J  ] = 0;
 					now_J++;
@@ -594,24 +595,24 @@ void run(char ch)
 				break;
 			case 6:
 				key_num_yellow++;
-				checkmap[now_I][now_J+1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J+1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
 				break;
 			case 7:
 				key_num_blue++;
-				checkmap[now_I][now_J+1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J+1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
 				break;
 			case 8:
 				key_num_red++;
-				checkmap[now_I][now_J+1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J+1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
@@ -623,24 +624,24 @@ void run(char ch)
 			case 15:
 			case 16:
 			case 17:
-				checkmap[now_I][now_J+1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J+1] = 0;
+				check_map[now_I][now_J  ] = 0;
                 fighting(now_map[now_I][now_J+1]);
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
 				break;
 			case 30:
-				checkmap[now_I][now_J+1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J+1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
 				HP1+=30;
 				break;
 			case 31:
-				checkmap[now_I][now_J+1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J+1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
@@ -648,24 +649,24 @@ void run(char ch)
                 Attack1+=10;
 				break;
 			case 32:
-				checkmap[now_I][now_J+1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J+1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
                 Attack1+=3;
 				break;
 			case 33:
-				checkmap[now_I][now_J+1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J+1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
                 Defend1+=8;
 				break;
 			case 35:
-				checkmap[now_I][now_J+1] = 0;
-				checkmap[now_I][now_J  ] = 0;
+				check_map[now_I][now_J+1] = 0;
+				check_map[now_I][now_J  ] = 0;
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
@@ -689,7 +690,7 @@ void print(void)
 	int i, j;
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
-			if (!checkmap[i][j]){
+			if (!check_map[i][j]){
 				switch (now_map[i][j]){
 					case 0:
 						gotoxy(j*5,i*3  );	printf("     ");
@@ -831,7 +832,7 @@ void print(void)
 						gotoxy(j*5,i*3+2);	printf("v v v");
 				}
 			}
-	memset(checkmap,1,sizeof(checkmap));
+	memset(check_map,1,sizeof(check_map));
 } 
 
 void quit(void)
@@ -839,7 +840,7 @@ void quit(void)
 	int i, j;
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
-			checkmap[i][j] = 0;
+			check_map[i][j] = 0;
 	clrscr();
 	print();
 }
