@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<dos.h>
 #include<conio.h>
+#include<time.h>
 #include"graphics.h" 
 
 #define green 2
@@ -23,11 +24,12 @@ void defeated(void);
 void Upstairs(void);
 void Downstairs(void);
 
-int HP1, Attack1, Defend1, Money, Exp, Lv;
+int Player_hp, Player_attack, Player_defend, Player_money, Player_exp, Player_level;
 int now_I, now_J, now_floor;
 int key_num_yellow, key_num_blue, key_num_red;
 int Exp_Need, Sword, Shield, Books;
 int check_map[16][16], now_map[16][16], map[5][16][16];
+int HP[100], Attack[100], Defend[100], Money[100], Exp[100];
 
 int main(void)
 {
@@ -52,13 +54,15 @@ void init(void)
 void prep(void)
 {
 	int i,j;
+	int driver=0, mode=VESA_1024x768x8bit;
+   	initgraph(&driver, &mode, "");
 	
-	HP1     = 150;
-	Attack1 = 13;
-	Defend1 = 10;
-	Money   = 0;
-	Exp     = 0;
-	Lv      = 0;
+	Player_hp     = 150;
+	Player_attack = 13;
+	Player_defend = 10;
+	Player_money   = 0;
+	Player_exp     = 0;
+	Player_level   = 0;
 
 	now_I   = 13;
 	now_J   = 7;
@@ -88,7 +92,7 @@ void work(void)
 	char ch;
 	while (1) {
 		print();
-		bioskey(0);
+		ch = bioskey(0);
 		if (ch == 'b') book();
 			else if (ch == 'i') look(); 
 				else if (ch == 'q') quit();
@@ -98,18 +102,210 @@ void work(void)
 
 void look(void)
 {
+	char ch;
+	
+	clrscr();
+	
+	gotoxy(1,10);
+	printf("                ");
+	textcolor(yellow);
+	printf("Yellow Key:    %d\n",key_num_yellow);
+	
+	gotoxy(1,12);
+	printf("                ");
+	textcolor(123);
+	printf("Blue Key:      %d\n",key_num_blue);
+	
+	gotoxy(1,14);
+	printf("                ");
+	textcolor(red);
+	printf("Red Key:       %d\n",key_num_red);
+	
+	gotoxy(1,17);
+	textcolor(green);
+	printf("                ");
+	printf("HP:  %d         ",Player_hp);
+	printf("Attack:  %d         ",Player_attack);
+	printf("Defend:  %d         ",Player_defend);
+	
+	gotoxy(1,19);
+	textcolor(white);
+	printf("                ");
+	printf("Lv:  %d         ",Player_level);
+	printf("Money:  %d         ",Player_money);
+	printf("Exp:  %d         ",Player_exp);
+	
+	gotoxy(1,21);
+	printf("                ");
+	printf("Next Level:  %d         ",Exp_Need-Player_exp);
+
+	gotoxy(20,25);
+	printf("     Please enter \'e\' to exit.     ");
+	
+	while (1) {
+		ch = bioskey(0);
+		if (ch == 'e'){
+			quit();
+			exit(0);
+		}
+	}
+	
 }
 
 void shop(void)
 {
+	char ch;
+	while (1){
+		clrscr();
+		gotoxy(3,8);
+		textcolor(yellow);
+		printf("   Shop:\'\'Player_money! Money! Give me your money!!!\'\'\n\n");
+		printf("       1.Hp + 30     Cost 50\n\n");
+		printf("       2.Attack + 2     Cost 50\n\n");
+		printf("       3.Defend + 1     Cost 50\n\n");
+		printf("       4.Yellow Key + 1     Cost 40\n\n");
+		printf("       5.Blue Key + 1     Cost 120\n\n");
+		printf("       6.Red Key + 1      Cost 300\n\n");
+		gotoxy(10,23);
+		printf("Your Money: %d",Player_money);
+		gotoxy(20,28);
+		printf("     Please enter \'e\' to exit.    ");
+		
+		ch = bioskey(0);
+		if (ch == '1' && Player_money >= 50){
+			Player_money-=50;
+			Player_hp+=30;
+			printf("    HP + 30 ~   OK!\n");
+		}	else 
+		if (ch == '2' && Player_money >= 50){
+			Player_money-=50;
+			Player_attack+=2;
+			printf("    Attack + 2 ~   OK!\n");
+		}	else
+		if (ch == '3' && Player_money >= 50){
+			Player_money-=50;
+			Player_defend+=1;
+			printf("    Defend + 1 ~   OK!\n");
+		}	else
+		if (ch == '4' && Player_money >= 40){
+			Player_money-=40;
+			key_num_yellow+=1;
+			printf("    Yellow Key + 1 ~   OK!\n");
+		}	else
+		if (ch == '5' && Player_money >= 120){
+			Player_money-=120;
+			key_num_blue+=1;
+			printf("    Blue Key + 1 ~   OK!\n");
+		}	else
+		if (ch == '6' && Player_money >= 300){
+			Player_money-=300;
+			key_num_red+=1;
+			printf("    Red Key + 1 ~   OK!\n");
+		}
+		gotoxy(10,23);
+		printf("Your Money:  %d",Player_money);
+		if (ch == 'e')	break;	
+	}	
+	quit();
 }
 
 void book(void)
 {
+	char ch;
+	if (Books) {
+		clrscr();
+		textcolor(yellow);
+		gotoxy(2,2);	printf(" --- ");
+		gotoxy(2,3);	printf("|o o|");
+		gotoxy(2,4);	printf("|___|");
+    	gotoxy(10,3);	printf(" HP: %d     Attack: %d     Defend: %d",HP[11],Attack[11],Defend[11]);
+		gotoxy(2,6);	printf(" --- ");
+		gotoxy(2,7);	printf("|o o|");
+		gotoxy(2,8);	printf("\\_o_/");
+    	gotoxy(10,7);	printf(" HP: %d     Attack: %d     Defend: %d",HP[12],Attack[12],Defend[12]);
+		gotoxy(2,10);	printf(" === ");
+		gotoxy(2,11);	printf("(o o)");
+		gotoxy(2,12);	printf("\\_^_/");
+    	gotoxy(10,11);	printf(" HP: %d     Attack: %d     Defend: %d",HP[13],Attack[13],Defend[13]);
+		gotoxy(2,14);	printf("/---\\");
+		gotoxy(2,15);	printf("|o o|");
+		gotoxy(2,16);	printf("v^^^v");
+    	gotoxy(10,15);	printf(" HP: %d     Attack: %d     Defend: %d",HP[14],Attack[14],Defend[14]);
+		gotoxy(2,18);	printf(" \\^/ ");
+		gotoxy(2,19);	printf("<o o>");
+		gotoxy(2,20);	printf("V\\x/V");
+    	gotoxy(10,19);	printf(" HP: %d     Attack: %d     Defend: %d",HP[15],Attack[15],Defend[15]);
+		gotoxy(2,22);	printf("UUUUU");
+		gotoxy(2,23);	printf("|o o|");
+		gotoxy(2,24);	printf("-----");
+    	gotoxy(10,23);	printf(" HP: %d     Attack: %d     Defend: %d",HP[16],Attack[16],Defend[16]);
+		gotoxy(2,26);	printf("Y M Y");
+		gotoxy(2,27);	printf("[o o]");
+		gotoxy(2,28);	printf("XXXXX");
+    	gotoxy(10,27);	printf(" HP: %d     Attack: %d     Defend: %d",HP[17],Attack[17],Defend[17]);
+		gotoxy(20,40);
+		printf("     Please enter \'e\' to exit.   \n");
+	}
 }
 
-void fighting(int monster)
+void fighting(int m)
 {
+	int i, r, damage, random;
+	int Miss, Bow;
+	int Monster_HP, Monster_Attack, Monster_Defend;
+	clrscr();
+	srand((unsigned)time(NULL));
+	Monster_HP = HP[m];
+	Monster_Attack = Attack[m];
+	Monster_Defend = Defend[m];
+	textcolor(yellow);
+	for (i=1; i<=30; i++) printf("-");
+	for (i=1; i<=15; i++) printf(" ");
+	for (i=1; i<=30; i++) printf("-");
+	gotoxy(1,2);	printf("|                            | ppp   k  k   |                             |");
+	gotoxy(1,3);	printf("|                            | p  p  k k    |                             |");
+	gotoxy(1,4);	printf("|                            | ppp   kk     |                             |");
+	gotoxy(1,5);	printf("|                            | p     k k    |                             |");
+	gotoxy(1,6);	printf("|                            | p     k  k   |                             |");
+	printf("\n");
+	for (i=1; i<=30; i++) printf("-");
+	for (i=1; i<=15; i++) printf(" ");
+	for (i=1; i<=30; i++) printf("-");
+	printf("\n");
+	
+	gotoxy(1,9);
+	textcolor(white);
+	printf("       %d                          %d",Monster_HP,Player_hp);
+	while (1) {
+		random = 1+ rand() % 100;
+		if (random < Miss && random > Bow){
+			damage = Player_attack - Monster_Defend;
+			if (damage < 0) damage = 0;
+			Monster_HP-=damage;
+			if (Monster_HP < 0) Monster_HP = 0;
+			printf("       %d                    ",Monster_HP);
+		}
+		if (random >= Miss){
+			printf("       %d        Miss...     ",Monster_HP);
+		}
+		if (random <= Bow){
+			damage = floor((Player_attack - Monster_Defend)*1.5);
+			if (damage < 0) damage = 0;
+			Monster_HP -= damage;
+			if (Monster_HP < 0) Monster_HP = 0;
+			printf("       %d        Bow...      ",Monster_HP);
+		}
+		if (Monster_HP <= 0) break;
+		//delay(200);
+		random = 1+ rand() % 100;
+		
+		
+		
+	}
+		
+	Player_money += Money[m];
+	Player_exp += Exp[m];
+	
 }
 
 void defeated(void)
@@ -238,7 +434,7 @@ void run(char ch)
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
-				HP1+=30;
+				Player_hp+=30;
 				break;	
 			case 31:
 				check_map[now_I-1][now_J] = 0;
@@ -247,7 +443,7 @@ void run(char ch)
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
 				Sword = 1;
-                Attack1+=10;
+                Player_attack+=10;
 				break;
 			case 32:
 				check_map[now_I-1][now_J] = 0;
@@ -255,7 +451,7 @@ void run(char ch)
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
-                Attack1+=3;
+                Player_attack+=3;
 				break;
 			case 33:
 				check_map[now_I-1][now_J] = 0;
@@ -263,7 +459,7 @@ void run(char ch)
 				now_map[now_I-1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I--;
-                Defend1+=8;
+                Player_defend+=8;
 				break;
 			case 35:
 				check_map[now_I-1][now_J] = 0;
@@ -371,7 +567,7 @@ void run(char ch)
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
-				HP1+=30;
+				Player_hp+=30;
 				break;
 			case 31:
 				check_map[now_I+1][now_J] = 0;
@@ -380,7 +576,7 @@ void run(char ch)
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
 				Sword = 1;
-                Attack1+=10;
+                Player_attack+=10;
 				break;
 			case 32:
 				check_map[now_I+1][now_J] = 0;
@@ -388,7 +584,7 @@ void run(char ch)
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
-                Attack1+=3;
+                Player_attack+=3;
 				break;
 			case 33:
 				check_map[now_I+1][now_J] = 0;
@@ -396,7 +592,7 @@ void run(char ch)
 				now_map[now_I+1][now_J] = 1;
 				now_map[now_I  ][now_J] = 0;
 				now_I++;
-                Defend1+=8;
+                Player_defend+=8;
 				break;
 			case 35:
 				check_map[now_I+1][now_J] = 0;
@@ -504,7 +700,7 @@ void run(char ch)
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
-				HP1+=30;
+				Player_hp+=30;
 				break;
 			case 31:
 				check_map[now_I][now_J-1] = 0;
@@ -513,7 +709,7 @@ void run(char ch)
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
 				Sword = 1;
-                Attack1+=10;
+                Player_attack+=10;
 				break;
 			case 32:
 				check_map[now_I][now_J-1] = 0;
@@ -521,7 +717,7 @@ void run(char ch)
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
-                Attack1+=3;
+                Player_attack+=3;
 				break;
 			case 33:
 				check_map[now_I][now_J-1] = 0;
@@ -529,7 +725,7 @@ void run(char ch)
 				now_map[now_I][now_J-1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J--;
-                Defend1+=8;
+                Player_defend+=8;
 				break;
 			case 35:
 				check_map[now_I][now_J-1] = 0;
@@ -637,7 +833,7 @@ void run(char ch)
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
-				HP1+=30;
+				Player_hp+=30;
 				break;
 			case 31:
 				check_map[now_I][now_J+1] = 0;
@@ -646,7 +842,7 @@ void run(char ch)
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
 				Sword = 1;
-                Attack1+=10;
+                Player_attack+=10;
 				break;
 			case 32:
 				check_map[now_I][now_J+1] = 0;
@@ -654,7 +850,7 @@ void run(char ch)
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
-                Attack1+=3;
+                Player_attack+=3;
 				break;
 			case 33:
 				check_map[now_I][now_J+1] = 0;
@@ -662,7 +858,7 @@ void run(char ch)
 				now_map[now_I][now_J+1] = 1;
 				now_map[now_I][now_J  ] = 0;
 				now_J++;
-                Defend1+=8;
+                Player_defend+=8;
 				break;
 			case 35:
 				check_map[now_I][now_J+1] = 0;

@@ -539,6 +539,7 @@ begin
   for i:=1 to 15 do write(' ');  
   for i:=1 to 30 do write('-');
   writeln;
+
   if n=11 then
   begin
     textcolor(5);
@@ -650,6 +651,7 @@ begin
     gotoxy(68,5);  write('\\___// ');
     gotoxy(68,6);  write(' \___/  ');
   end;
+  
   Money:=Money+mo[n];
   Exp:=Exp+ex[n];
   gotoxy(1,9);
