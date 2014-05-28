@@ -13,7 +13,7 @@ char map_str[305][7];
 int main(void) {
 	Info_Prep();
 	Map_Prep();
-	Magic();
+	Welcome();
 	return 0;
 }
 
@@ -105,15 +105,29 @@ void Map_Prep(void) {
 			now_map[i][j] = map[1][i][j];
 }
 
+void Welcome(void) {
+	char ch;
+	while (1) {
+		ch = bioskey(0);
+		if (ch == '1') break;
+		if (ch == '2') {
+			Load_Memory();
+			break;
+		}
+	}
+	Magic();
+}
+
 void Magic(void) {
 	char ch;
 	Map_Print();
 	while (1) {
 		ch = bioskey(0);
-		if (ch == '`') Esc();			
-		if (ch == 'i') Soldier_Info();
+		if (ch == '`') Esc();	
+		if (ch == 'i') Soldier_Info();		
 		if (ch == 'b') if (Books) Monster_Book();
-		if (ch == 'o') Shop();
+		if (ch == 'm') Set_Memory();
+		if (ch == 'l') Load_Memory();
 		if (ch == 'w') Run('w');	
 		if (ch == 's') Run('s');	
 		if (ch == 'a') Run('a');	
@@ -125,30 +139,40 @@ void Soldier_Info(void) {
 	char ch;
 	char * str = "temp";
 	cleardevice();
-	
+
+				setcolor(BLACK);
+				sprintf(str,"                    Red Key    :%8d", Key_num_red);
+				outtextxy(1,1+0*11,str);
+				setcolor(BLACK);
+				sprintf(str,"                    Blue Key   :%8d", Key_num_blue);
+				outtextxy(1,1+1*11,str);
+				setcolor(BLACK);
+				sprintf(str,"                     Yellow Key :%8d", Key_num_yellow);
+				outtextxy(1,1+3*11,str);				//Those black things are used to revised a unknown mistake
+
 	setcolor(YELLOW);
 	sprintf(str,"                         Yellow Key :%8d", Key_num_yellow);
-	outtextxy(1,10+3*11,str);
+	outtextxy(1,10+5*11,str);
 
 	setcolor(BLUE);
 	sprintf(str,"                         Blue Key   :%8d", Key_num_blue);
-	outtextxy(1,10+6*11,str);
+	outtextxy(1,10+8*11,str);
 
 	setcolor(RED);
 	sprintf(str,"                         Red Key    :%8d", Key_num_red);
-	outtextxy(1,10+9*11,str);	
+	outtextxy(1,10+11*11,str);	
 	
 	setcolor(GREEN);
 	sprintf(str,"          HP:  %8d      Attack:  %8d      Defend:  %8d ", Player_hp, Player_attack, Player_defend);
-	outtextxy(1,10+15*11,str);	
+	outtextxy(1,10+17*11,str);	
 
 	setcolor(CYAN);
 	sprintf(str,"          Lv:  %8d      Money :  %8d      Exp   :  %8d ", Player_level, Player_money, Player_exp);
-	outtextxy(1,10+21*11,str);	
+	outtextxy(1,10+23*11,str);	
 
 	setcolor(LIGHTMAGENTA);
 	sprintf(str,"                         Next Level:  %8d ", Exp_need-Player_exp);
-	outtextxy(1,10+30*11,str);
+	outtextxy(1,10+29*11,str);
 
 	setcolor(DARKGRAY);
 	outtextxy(1,10+40*11,"                      ( Please enter \'q\' to quit. )     ");
@@ -276,6 +300,85 @@ void Shop() {
 		if (ch == 'q')	break;	
 	}	
 	Quit();
+}
+
+void Set_Memory(void) {
+	int i,j,k;
+	FILE *fp;
+	fp = fopen("MEMORY.TXT","w+");
+	fprintf(fp,"%d\n",Player_hp);
+	fprintf(fp,"%d\n",Player_attack);
+	fprintf(fp,"%d\n",Player_defend);
+	fprintf(fp,"%d\n",Player_money);
+	fprintf(fp,"%d\n",Player_exp);
+	fprintf(fp,"%d\n",Player_level);
+	fprintf(fp,"%d\n",Player_miss);
+	fprintf(fp,"%d\n",Player_bow);
+	fprintf(fp,"%d\n",Now_i);
+	fprintf(fp,"%d\n",Now_j);
+	fprintf(fp,"%d\n",Now_floor);
+	fprintf(fp,"%d\n",Key_num_yellow);
+	fprintf(fp,"%d\n",Key_num_blue);
+	fprintf(fp,"%d\n",Key_num_red);
+	fprintf(fp,"%d\n",Exp_need);
+	fprintf(fp,"%d\n",Sword);
+	fprintf(fp,"%d\n",Shield);
+	fprintf(fp,"%d\n",Books);
+	fprintf(fp,"%d\n",Sword);
+
+	for (i=1; i<=14; i++)
+		for (j=1; j<=14; j++)
+			map[Now_floor][i][j] = now_map[i][j];
+
+	for (k=1; k<=4; k++)
+		for (i=1; i<=14; i++) {
+			for (j=1; j<=14; j++) 
+				fprintf(fp,"%d ",map[k][i][j]);
+			fprintf(fp, "\n");
+		}
+
+	fclose(fp);
+}
+
+void Load_Memory(void) {
+	int i,j,k;
+	FILE *fp;
+	fp = fopen("MEMORY.TXT","r");
+	fscanf(fp,"%d",&Player_hp);
+	fscanf(fp,"%d",&Player_attack);
+	fscanf(fp,"%d",&Player_defend);
+	fscanf(fp,"%d",&Player_money);
+	fscanf(fp,"%d",&Player_exp);
+	fscanf(fp,"%d",&Player_level);
+	fscanf(fp,"%d",&Player_miss);
+	fscanf(fp,"%d",&Player_bow);
+	fscanf(fp,"%d",&Now_i);
+	fscanf(fp,"%d",&Now_j);
+	fscanf(fp,"%d",&Now_floor);
+	fscanf(fp,"%d",&Key_num_yellow);
+	fscanf(fp,"%d",&Key_num_blue);
+	fscanf(fp,"%d",&Key_num_red);
+	fscanf(fp,"%d",&Exp_need);
+	fscanf(fp,"%d",&Sword);
+	fscanf(fp,"%d",&Shield);
+	fscanf(fp,"%d",&Books);
+	fscanf(fp,"%d",&Sword);
+
+	for (k=1; k<=4; k++)
+		for (i=1; i<=14; i++) 
+			for (j=1; j<=14; j++) 
+				fscanf(fp,"%d",&map[k][i][j]);
+		
+	for (i=1; i<=14; i++)
+		for (j=1; j<=14; j++){
+			check_map[i][j] = 0;
+			now_map[i][j] = map[Now_floor][i][j];
+		}
+
+	fclose(fp);
+
+	cleardevice();
+	Map_Print();
 }
 
 void Monster_Book(void) {
@@ -619,6 +722,8 @@ void Map_Print(void) {
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
 			if (!check_map[i][j]) {
+				setfillstyle(SOLID_FILL,BLACK);
+				bar(j*40,(i-1)*38+00,j*40+5*8,(i-1)*38+36);
 				setcolor(map_color[now_map[i][j]]);
 				sprintf(str,"%s",map_str[now_map[i][j]*3+1]);
 				outtextxy(j*40,(i-1)*38+00,str);
