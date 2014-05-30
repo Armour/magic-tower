@@ -25,4 +25,6 @@ void Map_Print(void);
 void Upstairs(void);
 void Downstairs(void);
 
+int Load_24bit_Bmp(int, int, char *);
+
 

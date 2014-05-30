@@ -1,15 +1,15 @@
 #include "magic.h"
 
 int Player_hp, Player_attack, Player_defend, Player_money, Player_exp, Player_level, Player_miss, Player_bow;
-int Now_i, Now_j, Now_floor;
+int Now_i, Now_j, Now_floor, Now_towards;
 int Key_num_yellow, Key_num_blue, Key_num_red;
 int Exp_need, Sword, Shield, Books;
 int x[5], y[5];
-int map_color[103];
 int map[10][20][20], now_map[20][20], check_map[20][20];
 int Monster_hp[100], Monster_attack[100], Monster_defend[100], Monster_money[100], Monster_exp[100], Monster_miss[100], Monster_bow[100];
-char map_str[305][7];
 	
+const int QSC = 32;
+
 int main(void) {
 	Info_Prep();
 	Map_Prep();
@@ -20,31 +20,32 @@ int main(void) {
 void Info_Prep(void) {
 	int graphdriver, graphmode;
 	graphdriver = DETECT;
-	graphmode = VESA_1024x768x8bit;
+	graphmode = VESA_1024x768x24bit;
    	initgraph(&graphdriver, &graphmode, "");
 	cleardevice();
 	
 	Player_hp     = 150;
-	Player_attack = 13;
-	Player_defend = 10;
+	Player_attack = 14;
+	Player_defend = 100;    //10;
 	Player_miss    = 8;
-	Player_bow	   = 95;
-	Player_money   = 10000000;
+	Player_bow	   = 94;
+	Player_money   = 10000; //0;
 	Player_exp     = 0;
 	Player_level   = 0;
 
 	Now_i   = 13;
 	Now_j   = 7;
 	Now_floor = 1;
+	Now_towards = 3;
 	
-	Key_num_yellow = 0;
-	Key_num_blue   = 0;
-	Key_num_red    = 0;
+	Key_num_yellow = 10;   //0;
+	Key_num_blue   = 10;   //0;
+	Key_num_red    = 10;   //0;
 	
 	Exp_need = 5;
 	Sword    = 0;
 	Shield   = 0;
-	Books    = 0;
+	Books    = 1;   //0;
 
 	x[1] = -1;
 	x[2] = 0;
@@ -60,56 +61,49 @@ void Info_Prep(void) {
 void Map_Prep(void) {
 	int i, j, floors, ascii = 219;
 	char ch = (char)ascii;
-	FILE *fp1, *fp2, *fp3, *fp4;
+	FILE *fp;
 
-	fp1 = fopen("floors.txt","r");
-	for (floors=1; floors<=4; floors++)
+	fp = fopen("floors.txt","r");
+	for (floors=1; floors<=8; floors++)
 		for (i=1; i<=14; i++)
 			for (j=1; j<=14; j++) 
-				fscanf(fp1,"%d",&map[floors][i][j]);
-	fclose(fp1);
+				fscanf(fp,"%d",&map[floors][i][j]);
+	fclose(fp);
 
-	fp2 = fopen("map.txt","r");
-	for (i=1; i<=303; i++) 
-		fscanf(fp2, "%s", map_str[i]);
-	fclose(fp2);
-
-	for (i=0; i<=303; i++)
-		for (j=0; j<=4; j++)
-			if (map_str[i][j] == '&')
-				map_str[i][j] = ' ';
-			else if (map_str[i][j] == '2')
-				map_str[i][j] = ch;
-	
-	fp3 = fopen("color.txt","r");
-	for (i=0; i<=100; i++)
-		fscanf(fp3, "%d", &map_color[i]);
-	fclose(fp3);
-
-	fp4 = fopen("monster.txt","r");
-	for (i=11; i<=17; i++) {
-		fscanf(fp4, "%d", &Monster_hp[i]);
-		fscanf(fp4, "%d", &Monster_attack[i]);
-		fscanf(fp4, "%d", &Monster_defend[i]);
-		fscanf(fp4, "%d", &Monster_money[i]);
-		fscanf(fp4, "%d", &Monster_exp[i]);
-		fscanf(fp4, "%d", &Monster_miss[i]);
-		fscanf(fp4, "%d", &Monster_bow[i]);
+	fp = fopen("monster.txt","r");
+	for (i=11; i<=22; i++) {
+		fscanf(fp, "%d", &Monster_hp[i]);
+		fscanf(fp, "%d", &Monster_attack[i]);
+		fscanf(fp, "%d", &Monster_defend[i]);
+		fscanf(fp, "%d", &Monster_money[i]);
+		fscanf(fp, "%d", &Monster_exp[i]);
+		fscanf(fp, "%d", &Monster_miss[i]);
+		fscanf(fp, "%d", &Monster_bow[i]);
 	}
-	fclose(fp4); 
+	fclose(fp); 
 
 	memset(now_map,0,sizeof(now_map));
 	memset(check_map,0,sizeof(check_map));
+
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
-			now_map[i][j] = map[1][i][j];
+			now_map[i][j] = map[Now_floor][i][j];
+
+	now_map[Now_i][Now_j] = 1;
 }
 
 void Welcome(void) {
 	char ch;
+	char * str = "temp";
+
+	Load_24bit_Bmp(50,1,"welcome.bmp");
+
 	while (1) {
 		ch = bioskey(0);
-		if (ch == '1') break;
+		if (ch == '1') {
+			cleardevice();
+			break;
+		} 
 		if (ch == '2') {
 			Load_Memory();
 			break;
@@ -140,42 +134,42 @@ void Soldier_Info(void) {
 	char * str = "temp";
 	cleardevice();
 
-				setcolor(BLACK);
-				sprintf(str,"                    Red Key    :%8d", Key_num_red);
+				setcolor(0x000000);
+				sprintf(str,"                    lalala    :%8d", Key_num_red);
 				outtextxy(1,1+0*11,str);
-				setcolor(BLACK);
-				sprintf(str,"                    Blue Key   :%8d", Key_num_blue);
+				setcolor(0x000000);
+				sprintf(str,"                    hahaha   :%8d", Key_num_blue);
 				outtextxy(1,1+1*11,str);
-				setcolor(BLACK);
-				sprintf(str,"                     Yellow Key :%8d", Key_num_yellow);
-				outtextxy(1,1+3*11,str);				//Those black things are used to revised a unknown mistake
+				setcolor(0x000000);
+				sprintf(str,"                     wholy fucking~ :%8d", Key_num_yellow);
+				outtextxy(1,1+3*11,str);				//Those 0x000000(black) things are used to revised a unknown mistake, they have no meaning...
 
-	setcolor(YELLOW);
+	setcolor(0xEEEE00);
 	sprintf(str,"                         Yellow Key :%8d", Key_num_yellow);
-	outtextxy(1,10+5*11,str);
+	outtextxy(200,10+5*11,str);
 
-	setcolor(BLUE);
+	setcolor(0x0000EE);
 	sprintf(str,"                         Blue Key   :%8d", Key_num_blue);
-	outtextxy(1,10+8*11,str);
+	outtextxy(200,10+8*11,str);
 
-	setcolor(RED);
+	setcolor(0xEE0000);
 	sprintf(str,"                         Red Key    :%8d", Key_num_red);
-	outtextxy(1,10+11*11,str);	
+	outtextxy(200,10+11*11,str);	
 	
-	setcolor(GREEN);
+	setcolor(0x00EE00);
 	sprintf(str,"          HP:  %8d      Attack:  %8d      Defend:  %8d ", Player_hp, Player_attack, Player_defend);
-	outtextxy(1,10+17*11,str);	
+	outtextxy(185,10+17*11,str);	
 
-	setcolor(CYAN);
+	setcolor(0x00EEEE);
 	sprintf(str,"          Lv:  %8d      Money :  %8d      Exp   :  %8d ", Player_level, Player_money, Player_exp);
-	outtextxy(1,10+23*11,str);	
+	outtextxy(185,10+23*11,str);	
 
-	setcolor(LIGHTMAGENTA);
+	setcolor(0xFF00FF);
 	sprintf(str,"                         Next Level:  %8d ", Exp_need-Player_exp);
-	outtextxy(1,10+29*11,str);
+	outtextxy(200,10+29*11,str);
 
-	setcolor(DARKGRAY);
-	outtextxy(1,10+40*11,"                      ( Please enter \'q\' to quit. )     ");
+	setcolor(0x666666);
+	outtextxy(200,10+40*11,"                      ( Please enter \'q\' to quit. )     ");
 	
 	while (1) {
 		ch = bioskey(0);
@@ -189,40 +183,40 @@ void Soldier_Info(void) {
 void Shop() {
 	char ch;
 	char * str = "temp";
-	int now_line = 22;
+	int now_line = 24;
 	cleardevice();
 
-	setcolor(WHITE);
+	setcolor(0xFFFFFF);
 	sprintf(str,"       Shop: Soldiers! Money! Money! Give me your money!!!");
-	outtextxy(3,10+0*11,str);
+	outtextxy(250,10+0*11,str);
 
-	setcolor(GREEN);
+	setcolor(0x00EE00);
 	sprintf(str,"            1.Hp + 30            Cost 50");
-	outtextxy(3,10+2*11,str);
+	outtextxy(250,10+2*11,str);
 	sprintf(str,"            2.Attack + 2         Cost 50");
-	outtextxy(3,10+4*11,str);
+	outtextxy(250,10+4*11,str);
 	sprintf(str,"            3.Defend + 1         Cost 50");
-	outtextxy(3,10+6*11,str);
+	outtextxy(250,10+6*11,str);
 
-	setcolor(YELLOW);
+	setcolor(0xEEEE00);
 	sprintf(str,"            4.Yellow Key + 1     Cost 40");
-	outtextxy(3,10+8*11,str);
+	outtextxy(250,10+8*11,str);
 
-	setcolor(BLUE);
+	setcolor(0x0000EE);
 	sprintf(str,"            5.Blue Key + 1       Cost 120");
-	outtextxy(3,10+10*11,str);
+	outtextxy(250,10+10*11,str);
 	
-	setcolor(RED);
+	setcolor(0xEE0000);
 	sprintf(str,"            6.Red Key + 1        Cost 300");
-	outtextxy(3,10+12*11,str);
+	outtextxy(250,10+12*11,str);
 
-	setcolor(WHITE);
+	setcolor(0xFFFFFF);
 	sprintf(str,"       Your Money: %d",Player_money);
-	outtextxy(3,10+14*11,str);
+	outtextxy(250,10+14*11,str);
 
-	setcolor(DARKGRAY);
+	setcolor(0x666666);
 	sprintf(str,"           ( Please enter \'q\' to quit. )   ");
-	outtextxy(3,10+18*11,str);
+	outtextxy(250,10+18*11,str);
 		
 	while (1){
 		ch = bioskey(0);
@@ -230,10 +224,10 @@ void Shop() {
 			Player_money-=50;
 			Player_hp += 30;
 			setfillstyle(SOLID_FILL,BLACK);
-			bar(1,10+now_line*11,500,10+(now_line+3)*11);
-			setcolor(GREEN);
+			bar(250,10+now_line*11,800,10+(now_line+4)*11);
+			setcolor(0x00EE00);
 			sprintf(str,"            HP + 30 ~          OK!");
-			outtextxy(3,10+now_line*11,str);
+			outtextxy(250,10+now_line*11,str);
 			now_line += 2;
 			if (now_line > 45) now_line = 24;
 		}	else 
@@ -241,10 +235,10 @@ void Shop() {
 			Player_money-=50;
 			Player_attack += 2;
 			setfillstyle(SOLID_FILL,BLACK);
-			bar(1,10+now_line*11,500,10+(now_line+3)*11);
-			setcolor(GREEN);
+			bar(250,10+now_line*11,800,10+(now_line+4)*11+3);
+			setcolor(0x00EE00);
 			sprintf(str,"            Attack + 2 ~       OK!");
-			outtextxy(3,10+now_line*11,str);
+			outtextxy(250,10+now_line*11,str);
 			now_line += 2;
 			if (now_line > 45) now_line = 24;
 		}	else
@@ -252,10 +246,10 @@ void Shop() {
 			Player_money-=50;
 			Player_defend += 1;
 			setfillstyle(SOLID_FILL,BLACK);
-			bar(1,10+now_line*11,500,10+(now_line+3)*11);
-			setcolor(GREEN);
+			bar(250,10+now_line*11,800,10+(now_line+4)*11+3);
+			setcolor(0x00EE00);
 			sprintf(str,"            Defend + 1 ~       OK!");
-			outtextxy(3,10+now_line*11,str);
+			outtextxy(250,10+now_line*11,str);
 			now_line += 2;
 			if (now_line > 45) now_line = 24;
 		}	else
@@ -263,10 +257,10 @@ void Shop() {
 			Player_money-=40;
 			Key_num_yellow += 1;
 			setfillstyle(SOLID_FILL,BLACK);
-			bar(1,10+now_line*11,500,10+(now_line+3)*11);
-			setcolor(YELLOW);
+			bar(250,10+now_line*11,800,10+(now_line+4)*11+3);
+			setcolor(0xEEEE00);
 			sprintf(str,"            Yellow Key + 1 ~   OK!");
-			outtextxy(3,10+now_line*11,str);
+			outtextxy(250,10+now_line*11,str);
 			now_line += 2;
 			if (now_line > 45) now_line = 24;
 		}	else
@@ -274,10 +268,10 @@ void Shop() {
 			Player_money-=120;
 			Key_num_blue += 1;
 			setfillstyle(SOLID_FILL,BLACK);
-			bar(1,10+now_line*11,500,10+(now_line+3)*11);
-			setcolor(BLUE);
+			bar(250,10+now_line*11,800,10+(now_line+4)*11+3);
+			setcolor(0x0000EE);
 			sprintf(str,"            Blue Key + 1 ~     OK!");
-			outtextxy(3,10+now_line*11,str);
+			outtextxy(250,10+now_line*11,str);
 			now_line += 2;
 			if (now_line > 45) now_line = 24;
 		}	else
@@ -285,18 +279,27 @@ void Shop() {
 			Player_money-=300;
 			Key_num_red += 1;
 			setfillstyle(SOLID_FILL,BLACK);
-			bar(1,10+now_line*11,500,10+(now_line+3)*11);
-			setcolor(RED);
+			bar(250,10+now_line*11,800,10+(now_line+4)*11+3);
+			setcolor(0xEE0000);
 			sprintf(str,"            Red Key + 1 ~      OK!");
-			outtextxy(3,10+now_line*11,str);
+			outtextxy(250,10+now_line*11,str);
+			now_line += 2;
+			if (now_line > 45) now_line = 24;
+		}	else 
+		if (ch == '1' || ch == '2' || ch == '3' || ch== '4' || ch =='5' || ch == '6') {
+			setfillstyle(SOLID_FILL,BLACK);
+			bar(250,10+now_line*11,800,10+(now_line+4)*11+3);
+			setcolor(0xFFFFFF);
+			sprintf(str,"            Where is your money, shit!");
+			outtextxy(250,10+now_line*11,str);
 			now_line += 2;
 			if (now_line > 45) now_line = 24;
 		}
 		setfillstyle(SOLID_FILL,BLACK);
-		bar(3,10+14*11,500,10+17*11);
-		setcolor(WHITE);
+		bar(250,10+14*11,800,10+17*11+3);
+		setcolor(0xFFFFFF);
 		sprintf(str,"       Your Money: %d",Player_money);
-		outtextxy(3,10+14*11,str);
+		outtextxy(250,10+14*11,str);
 		if (ch == 'q')	break;	
 	}	
 	Quit();
@@ -305,7 +308,7 @@ void Shop() {
 void Set_Memory(void) {
 	int i,j,k;
 	FILE *fp;
-	fp = fopen("MEMORY.TXT","w+");
+	fp = fopen("memory.txt","w+");
 	fprintf(fp,"%d\n",Player_hp);
 	fprintf(fp,"%d\n",Player_attack);
 	fprintf(fp,"%d\n",Player_defend);
@@ -317,6 +320,7 @@ void Set_Memory(void) {
 	fprintf(fp,"%d\n",Now_i);
 	fprintf(fp,"%d\n",Now_j);
 	fprintf(fp,"%d\n",Now_floor);
+	fprintf(fp,"%d\n",Now_towards);
 	fprintf(fp,"%d\n",Key_num_yellow);
 	fprintf(fp,"%d\n",Key_num_blue);
 	fprintf(fp,"%d\n",Key_num_red);
@@ -329,8 +333,10 @@ void Set_Memory(void) {
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
 			map[Now_floor][i][j] = now_map[i][j];
-
-	for (k=1; k<=4; k++)
+	
+	map[Now_floor][Now_i][Now_j] = 0;
+	
+	for (k=1; k<=8; k++)
 		for (i=1; i<=14; i++) {
 			for (j=1; j<=14; j++) 
 				fprintf(fp,"%d ",map[k][i][j]);
@@ -341,9 +347,9 @@ void Set_Memory(void) {
 }
 
 void Load_Memory(void) {
-	int i,j,k;
+	int i, j, k;
 	FILE *fp;
-	fp = fopen("MEMORY.TXT","r");
+	fp = fopen("memory.txt","r+");
 	fscanf(fp,"%d",&Player_hp);
 	fscanf(fp,"%d",&Player_attack);
 	fscanf(fp,"%d",&Player_defend);
@@ -355,6 +361,7 @@ void Load_Memory(void) {
 	fscanf(fp,"%d",&Now_i);
 	fscanf(fp,"%d",&Now_j);
 	fscanf(fp,"%d",&Now_floor);
+	fscanf(fp,"%d",&Now_towards);
 	fscanf(fp,"%d",&Key_num_yellow);
 	fscanf(fp,"%d",&Key_num_blue);
 	fscanf(fp,"%d",&Key_num_red);
@@ -364,45 +371,60 @@ void Load_Memory(void) {
 	fscanf(fp,"%d",&Books);
 	fscanf(fp,"%d",&Sword);
 
-	for (k=1; k<=4; k++)
+	for (k=1; k<=8; k++)
 		for (i=1; i<=14; i++) 
 			for (j=1; j<=14; j++) 
-				fscanf(fp,"%d",&map[k][i][j]);
-		
+				fscanf(fp,"%d",&map[k][i][j]);	
+	fclose(fp);
+
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++){
 			check_map[i][j] = 0;
 			now_map[i][j] = map[Now_floor][i][j];
 		}
 
-	fclose(fp);
-
+	now_map[Now_i][Now_j] = 1;
+	
 	cleardevice();
 	Map_Print();
 }
 
 void Monster_Book(void) {
-	int i;
+	int i, j;
+	int exist[30];
 	char ch;
 	char * str = "temp";
+	char * bmpstr = " ";
 	cleardevice();
-	for (i=11; i<=17; i++) {
-		setcolor(MAGENTA);
-		sprintf(str,"%s",map_str[i*3+1]);
-		outtextxy(1,(i-11)*52+1*12,str);
+	for (i=1; i<=30; i++)
+		exist[i] = 0;
+	for (i=1; i<=14; i++)
+		for (j=1; j<=14; j++)
+			if (now_map[i][j] >= 11 && now_map[i][j] <= 22)
+				exist[now_map[i][j]] = 1;
+	i = 10;
+	for (j=11; j<=22; j++) 
+		if (exist[j]) {
+			i++;
+			bmpstr = "";
+			sprintf(bmpstr,"%d.bmp",j);
+			Load_24bit_Bmp(50,(i-11)*52+1*12,bmpstr);
 
-		sprintf(str,"%s",map_str[i*3+2]);
-		outtextxy(1,(i-11)*52+2*12,str);
+			setcolor(0x00EE00);
+			sprintf(str," HP: %3d     Attack: %3d     Defend: %3d",Monster_hp[j],Monster_attack[j],Monster_defend[j]);
+			outtextxy(100,(i-11)*52+2*12,str);
 
-		sprintf(str,"%s",map_str[i*3+3]);
-		outtextxy(1,(i-11)*52+3*12,str);
+			setcolor(0xEE0000);
+			sprintf(str,"     Miss: %3d%%     Bow: %3d%%",Monster_miss[j],100-Monster_bow[j]);
+			outtextxy(430,(i-11)*52+2*12,str);
 
-		setcolor(YELLOW);
-		sprintf(str," HP: %d     Attack: %d     Defend: %d",Monster_hp[i],Monster_attack[i],Monster_defend[i]);
-		outtextxy(1,(i-11)*52+4*12,str);
-	}
-	setcolor(DARKGRAY);
-	outtextxy(1,450,"     ( Please enter \'q\' to quit. )     ");
+			setcolor(0xEEEEEE);
+			sprintf(str,"     Money: %3d     Exp: %3d",Monster_money[j],Monster_exp[j]);
+			outtextxy(650,(i-11)*52+2*12,str);
+		}
+
+	setcolor(0x666666);
+	outtextxy(250,800,"     ( Please enter \'q\' to quit. )     ");
 	while (1) {
 		ch = bioskey(0);
 		if (ch == 'q'){
@@ -415,6 +437,7 @@ void Monster_Book(void) {
 void Monster_Fight(int m) {
 	char ch;
 	char * str = "temp";
+	char * bmpstr = " ";
 	int i, r, damage, random, now_line;
 	int Monster_HP 	   = Monster_hp[m];
 	int Monster_Attack = Monster_attack[m];
@@ -422,74 +445,73 @@ void Monster_Fight(int m) {
 	srand((unsigned)time(NULL));
 
 	cleardevice();
-	setcolor(YELLOW);
+	setcolor(0xEEEE00);
+	str = "";
 	sprintf(str,"------------------------------               ------------------------------");
-	outtextxy(1,1+0*11,str);
+	outtextxy(185,1+0*11,str);
+	str = "";
 	sprintf(str,"|                            | ppp   k  k   |                             |");
-	outtextxy(1,1+1*11,str);
+	outtextxy(185,1+1*11,str);
+	str = "";
 	sprintf(str,"|                            | p  p  k k    |                             |");
-	outtextxy(1,1+2*11,str);
+	outtextxy(185,1+2*11,str);
+	str = "";
 	sprintf(str,"|                            | ppp   kk     |                             |");
-	outtextxy(1,1+3*11,str);
+	outtextxy(185,1+3*11,str);
+	str = "";
 	sprintf(str,"|                            | p     k  k   |                             |");
-	outtextxy(1,1+4*11,str);
+	outtextxy(185,1+4*11,str);
+	str = "";
 	sprintf(str,"------------------------------               ------------------------------");
-	outtextxy(1,1+5*11,str);
+	outtextxy(185,1+5*11,str);
 
-	setcolor(map_color[m]);
-	sprintf(str,"%s",map_str[m*3+1]);
-	outtextxy(100,1+1*11,str);
-	sprintf(str,"%s",map_str[m*3+2]);
-	outtextxy(100,1+2*11,str);
-	sprintf(str,"%s",map_str[m*3+3]);
-	outtextxy(100,1+3*11,str);
+	bmpstr = "";
+	sprintf(bmpstr,"%d.bmp",m);
+	Load_24bit_Bmp(287,1+1*11+6,bmpstr);
+	Load_24bit_Bmp(645,1+1*11+6,"1003.bmp");
 
-	setcolor(map_color[1]);
-	sprintf(str,"%s",map_str[1*3+1]);
-	outtextxy(450,1+1*11,str);
-	sprintf(str,"%s",map_str[1*3+2]);
-	outtextxy(450,1+2*11,str);
-	sprintf(str,"%s",map_str[1*3+3]);
-	outtextxy(450,1+3*11,str);
+	if (Sword) Load_24bit_Bmp(580,1+1*11+6,"31.bmp");
+	if (Shield) Load_24bit_Bmp(710,1+1*11+6,"33.bmp");
 
-	setcolor(WHITE);
+	str = "";
+	setcolor(0xFFFFFF);
 	sprintf(str,"                %5d                          %5d",Monster_HP,Player_hp);
-	outtextxy(1,1+7*11,str);
+	outtextxy(185,1+7*11,str);
 
 	now_line = 1+7*11;
 
 	while (1) {
 		now_line+=13;
-		if (now_line >= 1+30*11) now_line = 1+8*11;
+		if (now_line >= 1+20*13) now_line = 1+7*11+13;
 		setfillstyle(SOLID_FILL,BLACK);
-		bar(1,now_line,500,now_line+11);
+		bar(185,now_line,800,now_line+13*3-1);
 
 		random = 1+ rand() % 100;
 		if (random < Player_bow && random > Monster_miss[m]){
 			damage = Player_attack - Monster_Defend;
-			if (damage < 0) damage = 0;
+			if (damage <= 0) damage = 1;
 			Monster_HP-=damage;
 			if (Monster_HP < 0) Monster_HP = 0;
-			setcolor(WHITE);
+			setcolor(0xFFFFFF);
 			sprintf(str,"                %5d                   ",Monster_HP);
-			outtextxy(1,now_line,str);
+			outtextxy(185,now_line,str);
 		}
 		if (random <= Monster_miss[m]){
-			setcolor(LIGHTGREEN);
+			setcolor(0x7CFC00);
 			sprintf(str,"  Miss...       %5d                   ",Monster_HP);
-			outtextxy(1,now_line,str);
+			outtextxy(185,now_line,str);
 		}
 		if (random >= Player_bow){
 			damage = floor((Player_attack - Monster_Defend)*1.5);
-			if (damage < 0) damage = 0;
+			if (damage <= 0) damage = 1;
 			Monster_HP -= damage;
 			if (Monster_HP < 0) Monster_HP = 0;
-			setcolor(LIGHTRED);
+			setcolor(0xEE6A50);
 			sprintf(str,"  Bow !!!       %5d                   ",Monster_HP);
-			outtextxy(1,now_line,str);
+			outtextxy(185,now_line,str);
 		}
 		if (Monster_HP <= 0) break;
-		delay(200);
+		delay(120);
 
 		random = 1+ rand() % 100;		
 		if (random < Monster_bow[m] && random > Player_miss) {
@@ -497,41 +519,41 @@ void Monster_Fight(int m) {
 			if (damage < 0) damage = 0;
 			Player_hp-=damage;
 			if (Player_hp < 0) Player_hp=0;
-			setcolor(WHITE);
+			setcolor(0xFFFFFF);
 			sprintf(str,"                                               %5d                ",Player_hp);
-			outtextxy(1,now_line,str);
+			outtextxy(185,now_line,str);
 		}
 		if (random <= Player_miss) {
-			setcolor(LIGHTGREEN);
+			setcolor(0x7CFC00);
 			sprintf(str,"                                               %5d         Miss...",Player_hp);
-			outtextxy(1,now_line,str);
+			outtextxy(185,now_line,str);
 		}
 		if (random >= Monster_bow[m]) {
-
 			damage = floor((Monster_attack[m] - Player_defend)*1.5);
 			if (damage < 0) damage = 0;
 			Player_hp-=damage;
 			if (Player_hp < 0) Player_hp=0;
-			setcolor(LIGHTRED);
+			setcolor(0xEE6A50);
 			sprintf(str,"                                               %5d         Bow !!!",Player_hp);
-			outtextxy(1,now_line,str);
+			outtextxy(185,now_line,str);
 		}
 		if (Player_hp <= 0) break;
-		delay(200);
+		delay(120);
 	}
 		
 	Player_money  +=  Monster_money[m];
 	Player_exp  +=  Monster_exp[m];	
 
 	cleardevice();
-	setcolor(RED);
+	setcolor(0xEE0000);
 	if (Player_hp <= 0) Monster_Defeated();
 	if (Player_hp > 0) {
 		sprintf(str,"                                  You Win!!!");
-		outtextxy(1,1+7*11,str);
-		sprintf(str,"                        You earn %d Money and %d Exp!!      ", Monster_money[m], Monster_exp[m]);
-		outtextxy(1,1+10*11,str);
+		outtextxy(185,1+7*11,str);
+		sprintf(str,"                        You earn %d Money and %d Experience!!      ", Monster_money[m], Monster_exp[m]);
+		outtextxy(185,1+10*11,str);
 	}
+	setcolor(0x00EE00);
 	if (Player_exp >= Exp_need) {
 		Player_exp -= Exp_need;
 		Exp_need = floor(Exp_need*1.5)+1;
@@ -540,9 +562,9 @@ void Monster_Fight(int m) {
 		Player_defend += 1;
 		Player_level += 1;
 		sprintf(str,"                                  Level  Up  !!!!");
-		outtextxy(1,1+18*11,str);
+		outtextxy(185,1+18*11,str);
 		sprintf(str,"                         HP+10!    Attak+1!     Defend+1!");
-		outtextxy(1,1+21*11,str);
+		outtextxy(185,1+21*11,str);
 	}
 
 	while (1) {
@@ -556,90 +578,92 @@ void Monster_Fight(int m) {
 
 void Monster_Defeated(void) {
 	cleardevice();
-	load_8bit_bmp(1, 1, "defeated.bmp");
+	Load_24bit_Bmp(45, 1, "defeated.bmp");
 	delay(3000);
 	cleardevice();
+	text_mode();
 	exit(0);
 }
 
 void Run(char ch) {
-	int m, k = 1;
-	if (ch == 'w') k=1;
-	if (ch == 'a') k=2;
-	if (ch == 's') k=3;
-	if (ch == 'd') k=4;
-	switch (now_map[Now_i+x[k]][Now_j+y[k]]){
+	int m;
+	if (ch == 'w') Now_towards=1;
+	if (ch == 'a') Now_towards=2;
+	if (ch == 's') Now_towards=3;
+	if (ch == 'd') Now_towards=4;
+	switch (now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]]){
 		case 0:
 		case 9:
-			check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+		case 59:
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
-			now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 			now_map[Now_i  ][Now_j] = 0;
-			Now_i+=x[k];
-			Now_j+=y[k];
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
 			break;
 		case 3:
 			if (Key_num_yellow > 0)
 			{
 				Key_num_yellow--;
-				check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+				check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 				check_map[Now_i  ][Now_j] = 0;
-				now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+				now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 				now_map[Now_i  ][Now_j] = 0;
-				Now_i+=x[k];
-				Now_j+=y[k];
+				Now_i+=x[Now_towards];
+				Now_j+=y[Now_towards];
 			}
 			break;
 		case 4:
 			if (Key_num_blue > 0)
 			{
 				Key_num_blue--;
-				check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+				check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 				check_map[Now_i  ][Now_j] = 0;
-				now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+				now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 				now_map[Now_i  ][Now_j] = 0;
-				Now_i+=x[k];
-				Now_j+=y[k];
+				Now_i+=x[Now_towards];
+				Now_j+=y[Now_towards];
 			}
 			break;
 		case 5:
 			if (Key_num_red > 0)
 			{
 				Key_num_red--;
-				check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+				check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 				check_map[Now_i  ][Now_j] = 0;
-				now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+				now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 				now_map[Now_i  ][Now_j] = 0;
-				Now_i+=x[k];
-				Now_j+=y[k];
+				Now_i+=x[Now_towards];
+				Now_j+=y[Now_towards];
 			}
 			break;
 		case 6:
 			Key_num_yellow++;
-			check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
-			now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 			now_map[Now_i  ][Now_j] = 0;
-			Now_i+=x[k];
-			Now_j+=y[k];
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
 			break;
 		case 7:
 			Key_num_blue++;
-			check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
-			now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 			now_map[Now_i  ][Now_j] = 0;
-			Now_i+=x[k];
-			Now_j+=y[k];
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
 			break;
 		case 8:
 			Key_num_red++;
-			check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
-			now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 			now_map[Now_i  ][Now_j] = 0;
-			Now_i+=x[k];
-			Now_j+=y[k];
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
 			break;
 		case 11:
 		case 12:
@@ -648,59 +672,92 @@ void Run(char ch) {
 		case 15:
 		case 16:
 		case 17:
-			m = now_map[Now_i+x[k]][Now_j+y[k]];
-			check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+		case 18:
+		case 19:
+		case 20:
+		case 21:
+		case 22:
+			m = now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]];
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
-			now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 			now_map[Now_i  ][Now_j] = 0;
-			Now_i+=x[k];
-			Now_j+=y[k];
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
             Monster_Fight(m);
 			break;
-		case 30:
-			check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+		case 28:
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
-			now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 			now_map[Now_i  ][Now_j] = 0;
-			Now_i+=x[k];
-			Now_j+=y[k];
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
+			Player_money += 15;
+			break;
+		case 29:
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
+			check_map[Now_i  ][Now_j] = 0;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
+			now_map[Now_i  ][Now_j] = 0;
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
+			Player_hp += 18;
+			break;
+		case 30:
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
+			check_map[Now_i  ][Now_j] = 0;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
+			now_map[Now_i  ][Now_j] = 0;
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
 			Player_hp += 30;
 			break;	
 		case 31:
-			check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
-			now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 			now_map[Now_i  ][Now_j] = 0;
-			Now_i+=x[k];
-			Now_j+=y[k];
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
 			Sword = 1;
             Player_attack += 10;
 			break;
 		case 32:
-			check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
-			now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 			now_map[Now_i  ][Now_j] = 0;
-			Now_i+=x[k];
-			Now_j+=y[k];
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
             Player_attack += 3;
 			break;
 		case 33:
-			check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
-			now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 			now_map[Now_i  ][Now_j] = 0;
-			Now_i+=x[k];
-			Now_j+=y[k];
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
+			Shield = 1;
             Player_defend += 8;
 			break;
-		case 35:
-			check_map[Now_i+x[k]][Now_j+y[k]] = 0;
+		case 34:
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
-			now_map[Now_i+x[k]][Now_j+y[k]] = 1;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
 			now_map[Now_i  ][Now_j] = 0;
-			Now_i+=x[k];
-			Now_j+=y[k];
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
+            Player_defend += 2;
+            break;
+		case 35:
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
+			check_map[Now_i  ][Now_j] = 0;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
+			now_map[Now_i  ][Now_j] = 0;
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
             Books = 1;
 			break;
 		case 51:
@@ -717,21 +774,26 @@ void Run(char ch) {
 }
 
 void Map_Print(void) {
-	int i,j;
-	char * str = "temp";
+	int i, j, number;
+	char * bmpstr = " ";
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
 			if (!check_map[i][j]) {
-				setfillstyle(SOLID_FILL,BLACK);
-				bar(j*40,(i-1)*38+00,j*40+5*8,(i-1)*38+36);
-				setcolor(map_color[now_map[i][j]]);
-				sprintf(str,"%s",map_str[now_map[i][j]*3+1]);
-				outtextxy(j*40,(i-1)*38+00,str);
-				sprintf(str,"%s",map_str[now_map[i][j]*3+2]);
-				outtextxy(j*40,(i-1)*38+12,str);
-				sprintf(str,"%s",map_str[now_map[i][j]*3+3]);
-				outtextxy(j*40,(i-1)*38+24,str);
+
+				setfillstyle(SOLID_FILL,0x000000);
+				bar(250+ j*QSC,(i-1)*QSC,250+ j*QSC+QSC-1,(i-1)*QSC+QSC-1);
+
+				number = now_map[i][j];
+				if (now_map[i][j] == 1) 
+					number = 1000 + Now_towards;
+
+				bmpstr = "";
+				sprintf(bmpstr,"%d.bmp",number);
+
+				Load_24bit_Bmp(250+ j*QSC,(i-1)*QSC,bmpstr);
+
 			}
+
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
 			check_map[i][j] = 1;
@@ -740,6 +802,7 @@ void Map_Print(void) {
 void Upstairs(void) {
 	int i, j;
 	cleardevice();
+	now_map[Now_i][Now_j] = 0;
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++){
 			map[Now_floor][i][j] = now_map[i][j];
@@ -747,12 +810,14 @@ void Upstairs(void) {
 			check_map[i][j] = 0;
 		}
 	Now_floor++; 
+	now_map[Now_i][Now_j] = 1;
 	Map_Print();
 }
 
 void Downstairs(void) {
 	int i, j;
 	cleardevice();
+	now_map[Now_i][Now_j] = 0;
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++){
 			map[Now_floor][i][j] = now_map[i][j];
@@ -760,6 +825,7 @@ void Downstairs(void) {
 			check_map[i][j] = 0;
 		}
 	Now_floor--; 
+	now_map[Now_i][Now_j] = 1;
 	Map_Print();
 }
 
@@ -774,5 +840,45 @@ void Quit(void) {
 
 void Esc() {
 	cleardevice();
+	text_mode();
 	exit(0);
+}
+
+int Load_24bit_Bmp(int x, int y, char *filename) {
+	FILE *fp = NULL;
+	byte *p = NULL; /* pointer to a line of bmp data */
+	byte *vp = _vp + (_active_page*_page_gap + y*_width + x) * (_color_bits/8);
+	dword width, height, bmp_data_offset, bytes_per_line, offset;
+	int i;
+	p = malloc(1024L * 3);  /* memory for holding a line of bmp data */
+	if(p == NULL)  /* cannot allocate enough memory for drawing 1 line */
+	   goto display_bmp_error;
+	fp = fopen(filename, "rb");
+	if(fp == NULL) /* cannot open bmp file */
+	   goto display_bmp_error;
+	fread(p, 1, 0x36, fp);     /* read BMP head */
+	if(*(word *)p != 0x4D42)   /* check BMP signature */
+	   goto display_bmp_error; /* not a BMP file */
+	if(*(word *)(p+0x1C) != 24)
+	   goto display_bmp_error; /* not a 24-bit-color BMP file */
+	width = *(dword *)(p+0x12);
+	height = *(dword *)(p+0x16);
+	bmp_data_offset = *(dword *)(p+0x0A);
+	fseek(fp, bmp_data_offset, SEEK_SET); /* skip BMP head */
+	bytes_per_line = (width * 3 + 3) / 4 * 4; /* must be multiple of 4 */
+	for(i=height-1; i>=0; i--)          /* draw from bottom to top */
+	{
+	   fread(p, 1, bytes_per_line, fp); /* read a line of bmp data */
+	   offset = i * 1024 * 3;
+	   memcpy(vp+offset, p, width*3);
+	}
+	free(p);
+	fclose(fp);
+	return 1;
+	display_bmp_error:
+	if(p != NULL)
+	   free(p);
+	if(fp != NULL)
+	   fclose(fp);
+    return 0;
 }
