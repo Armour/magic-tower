@@ -3,12 +3,26 @@
 int Player_hp, Player_attack, Player_defend, Player_money, Player_exp, Player_level, Player_miss, Player_bow;
 int Now_i, Now_j, Now_floor, Now_towards;
 int Key_num_yellow, Key_num_blue, Key_num_red;
-int Exp_need, Sword, Shield, Books;
+int Exp_need, Sword, Shield, Books, Is_girl;
+
+int Memory_Player_hp, Memory_Player_attack, Memory_Player_defend, Memory_Player_money, Memory_Player_exp, Memory_Player_level, Memory_Player_miss, Memory_Player_bow;
+int Memory_Now_i, Memory_Now_j, Memory_Now_floor, Memory_Now_towards;
+int Memory_Key_num_yellow, Memory_Key_num_blue, Memory_Key_num_red;
+int Memory_Exp_need, Memory_Sword, Memory_Shield, Memory_Books, Memory_Is_girl;
+
+int speed;
 int x[5], y[5];
-int map[10][20][20], now_map[20][20], check_map[20][20];
+int Memory_map[11][20][20];
+int map[11][20][20], now_map[20][20], check_map[20][20];
 int Monster_hp[100], Monster_attack[100], Monster_defend[100], Monster_money[100], Monster_exp[100], Monster_miss[100], Monster_bow[100];
-	
+int graphdriver, graphmode;	
+
+FILE *fp;
+
 const int QSC = 32;
+const int LOWSPEED = 200;
+const int MIDSPEED = 150;
+const int HIGHSPEED = 110;
 
 int main(void) {
 	Info_Prep();
@@ -18,18 +32,12 @@ int main(void) {
 }
 
 void Info_Prep(void) {
-	int graphdriver, graphmode;
 	graphdriver = DETECT;
 	graphmode = VESA_1024x768x24bit;
    	initgraph(&graphdriver, &graphmode, "");
 	cleardevice();
 	
-	Player_hp     = 150;
-	Player_attack = 14;
-	Player_defend = 100;    //10;
-	Player_miss    = 8;
-	Player_bow	   = 94;
-	Player_money   = 10000; //0;
+	Player_money   = 0;
 	Player_exp     = 0;
 	Player_level   = 0;
 
@@ -38,14 +46,16 @@ void Info_Prep(void) {
 	Now_floor = 1;
 	Now_towards = 3;
 	
-	Key_num_yellow = 10;   //0;
-	Key_num_blue   = 10;   //0;
-	Key_num_red    = 10;   //0;
+	Key_num_yellow = 10;
+	Key_num_blue   = 10;
+	Key_num_red    = 10;
 	
 	Exp_need = 5;
 	Sword    = 0;
 	Shield   = 0;
-	Books    = 1;   //0;
+	Books    = 0;
+
+	speed = MIDSPEED;
 
 	x[1] = -1;
 	x[2] = 0;
@@ -59,19 +69,18 @@ void Info_Prep(void) {
 }
 
 void Map_Prep(void) {
-	int i, j, floors, ascii = 219;
+	int i, j, k, floors, ascii = 219;
 	char ch = (char)ascii;
-	FILE *fp;
 
 	fp = fopen("floors.txt","r");
-	for (floors=1; floors<=8; floors++)
+	for (floors=1; floors<=10; floors++)
 		for (i=1; i<=14; i++)
 			for (j=1; j<=14; j++) 
 				fscanf(fp,"%d",&map[floors][i][j]);
 	fclose(fp);
 
 	fp = fopen("monster.txt","r");
-	for (i=11; i<=22; i++) {
+	for (i=11; i<=23; i++) {
 		fscanf(fp, "%d", &Monster_hp[i]);
 		fscanf(fp, "%d", &Monster_attack[i]);
 		fscanf(fp, "%d", &Monster_defend[i]);
@@ -81,6 +90,34 @@ void Map_Prep(void) {
 		fscanf(fp, "%d", &Monster_bow[i]);
 	}
 	fclose(fp); 
+
+	fp = fopen("memory.txt","r");
+	fscanf(fp,"%d",&Memory_Player_hp);
+	fscanf(fp,"%d",&Memory_Player_attack);
+	fscanf(fp,"%d",&Memory_Player_defend);
+	fscanf(fp,"%d",&Memory_Player_money);
+	fscanf(fp,"%d",&Memory_Player_exp);
+	fscanf(fp,"%d",&Memory_Player_level);
+	fscanf(fp,"%d",&Memory_Player_miss);
+	fscanf(fp,"%d",&Memory_Player_bow);
+	fscanf(fp,"%d",&Memory_Now_i);
+	fscanf(fp,"%d",&Memory_Now_j);
+	fscanf(fp,"%d",&Memory_Now_floor);
+	fscanf(fp,"%d",&Memory_Now_towards);
+	fscanf(fp,"%d",&Memory_Key_num_yellow);
+	fscanf(fp,"%d",&Memory_Key_num_blue);
+	fscanf(fp,"%d",&Memory_Key_num_red);
+	fscanf(fp,"%d",&Memory_Exp_need);
+	fscanf(fp,"%d",&Memory_Sword);
+	fscanf(fp,"%d",&Memory_Shield);
+	fscanf(fp,"%d",&Memory_Books);
+	fscanf(fp,"%d",&Memory_Is_girl);
+
+	for (k=1; k<=10; k++)
+		for (i=1; i<=14; i++) 
+			for (j=1; j<=14; j++) 
+				fscanf(fp,"%d",&Memory_map[k][i][j]);
+	fclose(fp);
 
 	memset(now_map,0,sizeof(now_map));
 	memset(check_map,0,sizeof(check_map));
@@ -94,7 +131,6 @@ void Map_Prep(void) {
 
 void Welcome(void) {
 	char ch;
-	char * str = "temp";
 
 	Load_24bit_Bmp(50,1,"welcome.bmp");
 
@@ -102,14 +138,46 @@ void Welcome(void) {
 		ch = bioskey(0);
 		if (ch == '1') {
 			cleardevice();
+			Select_Sex();
 			break;
 		} 
 		if (ch == '2') {
 			Load_Memory();
 			break;
 		}
+		if (ch == '3') {
+			Esc();
+			break;
+		}
 	}
 	Magic();
+}
+
+void Select_Sex(void) {
+	char ch;
+	Load_24bit_Bmp(250,1,"select.bmp");
+	while (1) {
+		ch = bioskey(0);
+		if (ch == '1') {
+			Is_girl = 0;
+			Player_hp     = 1500;   //150
+			Player_attack = 14;
+			Player_defend = 10;
+			Player_miss    = 8;
+			Player_bow	   = 93;
+			break;
+		};
+		if (ch == '2') {
+			Is_girl = 1;
+			Player_hp     = 2000;   //200
+			Player_attack = 13;
+			Player_defend = 10;
+			Player_miss    = 17;
+			Player_bow	   = 99;
+			break;
+		}
+	}
+	cleardevice();
 }
 
 void Magic(void) {
@@ -118,8 +186,9 @@ void Magic(void) {
 	while (1) {
 		ch = bioskey(0);
 		if (ch == '`') Esc();	
-		if (ch == 'i') Soldier_Info();		
+		//if (ch == 'i') Soldier_Info();		
 		if (ch == 'b') if (Books) Monster_Book();
+		if (ch == 'h') Help(); 
 		if (ch == 'm') Set_Memory();
 		if (ch == 'l') Load_Memory();
 		if (ch == 'w') Run('w');	
@@ -129,20 +198,10 @@ void Magic(void) {
 	}
 }
 
-void Soldier_Info(void) {
+/*void Soldier_Info(void) {
 	char ch;
-	char * str = "temp";
+	char * str = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
 	cleardevice();
-
-				setcolor(0x000000);
-				sprintf(str,"                    lalala    :%8d", Key_num_red);
-				outtextxy(1,1+0*11,str);
-				setcolor(0x000000);
-				sprintf(str,"                    hahaha   :%8d", Key_num_blue);
-				outtextxy(1,1+1*11,str);
-				setcolor(0x000000);
-				sprintf(str,"                     wholy fucking~ :%8d", Key_num_yellow);
-				outtextxy(1,1+3*11,str);				//Those 0x000000(black) things are used to revised a unknown mistake, they have no meaning...
 
 	setcolor(0xEEEE00);
 	sprintf(str,"                         Yellow Key :%8d", Key_num_yellow);
@@ -178,11 +237,22 @@ void Soldier_Info(void) {
 			break;
 		}
 	}
+}*/
+
+void Help(void) {
+	char ch;
+	cleardevice();
+	Load_24bit_Bmp(250,1,"help.bmp");
+	while (1) {
+		ch = bioskey(0);
+		Quit();
+		break;
+	}
 }
 
-void Shop() {
+void Shop(void) {
 	char ch;
-	char * str = "temp";
+	char * str = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
 	int now_line = 24;
 	cleardevice();
 
@@ -307,8 +377,7 @@ void Shop() {
 
 void Set_Memory(void) {
 	int i,j,k;
-	FILE *fp;
-	fp = fopen("memory.txt","w+");
+	fp = fopen("memory.txt","w");
 	fprintf(fp,"%d\n",Player_hp);
 	fprintf(fp,"%d\n",Player_attack);
 	fprintf(fp,"%d\n",Player_defend);
@@ -328,7 +397,7 @@ void Set_Memory(void) {
 	fprintf(fp,"%d\n",Sword);
 	fprintf(fp,"%d\n",Shield);
 	fprintf(fp,"%d\n",Books);
-	fprintf(fp,"%d\n",Sword);
+	fprintf(fp,"%d\n",Is_girl);
 
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
@@ -336,7 +405,7 @@ void Set_Memory(void) {
 	
 	map[Now_floor][Now_i][Now_j] = 0;
 	
-	for (k=1; k<=8; k++)
+	for (k=1; k<=10; k++)
 		for (i=1; i<=14; i++) {
 			for (j=1; j<=14; j++) 
 				fprintf(fp,"%d ",map[k][i][j]);
@@ -344,38 +413,61 @@ void Set_Memory(void) {
 		}
 
 	fclose(fp);
-}
 
-void Load_Memory(void) {
-	int i, j, k;
-	FILE *fp;
-	fp = fopen("memory.txt","r+");
-	fscanf(fp,"%d",&Player_hp);
-	fscanf(fp,"%d",&Player_attack);
-	fscanf(fp,"%d",&Player_defend);
-	fscanf(fp,"%d",&Player_money);
-	fscanf(fp,"%d",&Player_exp);
-	fscanf(fp,"%d",&Player_level);
-	fscanf(fp,"%d",&Player_miss);
-	fscanf(fp,"%d",&Player_bow);
-	fscanf(fp,"%d",&Now_i);
-	fscanf(fp,"%d",&Now_j);
-	fscanf(fp,"%d",&Now_floor);
-	fscanf(fp,"%d",&Now_towards);
-	fscanf(fp,"%d",&Key_num_yellow);
-	fscanf(fp,"%d",&Key_num_blue);
-	fscanf(fp,"%d",&Key_num_red);
-	fscanf(fp,"%d",&Exp_need);
-	fscanf(fp,"%d",&Sword);
-	fscanf(fp,"%d",&Shield);
-	fscanf(fp,"%d",&Books);
-	fscanf(fp,"%d",&Sword);
+	Memory_Player_hp 		= Player_hp;  	
+	Memory_Player_attack 	= Player_attack; 
+	Memory_Player_defend 	= Player_defend; 
+	Memory_Player_money 	= Player_money;  
+	Memory_Player_exp 		= Player_exp;  
+	Memory_Player_level 	= Player_level; 
+	Memory_Player_miss 		= Player_miss;  
+	Memory_Player_bow 		= Player_bow;  
+	Memory_Now_i 			= Now_i;  		
+	Memory_Now_j 			= Now_j; 		
+	Memory_Now_floor 		= Now_floor;  	
+	Memory_Now_towards 		= Now_towards;  
+	Memory_Key_num_yellow 	= Key_num_yellow;
+	Memory_Key_num_blue 	= Key_num_blue;  
+	Memory_Key_num_red 		= Key_num_red;  
+	Memory_Exp_need 		= Exp_need;  	
+	Memory_Sword 			= Sword;  		
+	Memory_Shield 			= Shield;  	
+	Memory_Books 			= Books; 		
+	Memory_Is_girl 			= Is_girl; 	
 
 	for (k=1; k<=8; k++)
 		for (i=1; i<=14; i++) 
 			for (j=1; j<=14; j++) 
-				fscanf(fp,"%d",&map[k][i][j]);	
-	fclose(fp);
+				Memory_map[k][i][j] = map[k][i][j];	
+}
+
+void Load_Memory(void) {
+	int i, j, k;
+	Player_hp  		= Memory_Player_hp;
+	Player_attack 	= Memory_Player_attack;
+	Player_defend 	= Memory_Player_defend;
+	Player_money  	= Memory_Player_money;
+	Player_exp  	= Memory_Player_exp;
+	Player_level 	= Memory_Player_level;
+	Player_miss  	= Memory_Player_miss;
+	Player_bow  	= Memory_Player_bow;
+	Now_i  			= Memory_Now_i;
+	Now_j 			= Memory_Now_j;
+	Now_floor  		= Memory_Now_floor;
+	Now_towards  	= Memory_Now_towards;
+	Key_num_yellow	= Memory_Key_num_yellow;
+	Key_num_blue  	= Memory_Key_num_blue;
+	Key_num_red  	= Memory_Key_num_red;
+	Exp_need  		= Memory_Exp_need;
+	Sword  			= Memory_Sword;
+	Shield  		= Memory_Shield;
+	Books 			= Memory_Books;
+	Is_girl 		= Memory_Is_girl;
+
+	for (k=1; k<=10; k++)
+		for (i=1; i<=14; i++) 
+			for (j=1; j<=14; j++) 
+				map[k][i][j] = Memory_map[k][i][j];	
 
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++){
@@ -389,12 +481,34 @@ void Load_Memory(void) {
 	Map_Print();
 }
 
+void Tips_Oldman(void) {
+	char ch;
+	cleardevice();
+	Load_24bit_Bmp(250,1,"tips1.bmp");
+	while (1) {
+		ch = bioskey(0);
+		Quit();
+		break;
+	}
+}
+
+void Tips_Sorceress(void) {
+	char ch;
+	cleardevice();
+	Load_24bit_Bmp(250,1,"tips2.bmp");
+	while (1) {
+		ch = bioskey(0);
+		Quit();
+		break;
+	}
+}
+
 void Monster_Book(void) {
 	int i, j;
 	int exist[30];
 	char ch;
-	char * str = "temp";
-	char * bmpstr = " ";
+	char * str = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+	char * bmpstr = "                                                                      ";
 	cleardevice();
 	for (i=1; i<=30; i++)
 		exist[i] = 0;
@@ -436,8 +550,8 @@ void Monster_Book(void) {
 
 void Monster_Fight(int m) {
 	char ch;
-	char * str = "temp";
-	char * bmpstr = " ";
+	char * str = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+	char * bmpstr = "                                                                                   ";
 	int i, r, damage, random, now_line;
 	int Monster_HP 	   = Monster_hp[m];
 	int Monster_Attack = Monster_attack[m];
@@ -445,31 +559,17 @@ void Monster_Fight(int m) {
 	srand((unsigned)time(NULL));
 
 	cleardevice();
-	setcolor(0xEEEE00);
-	str = "";
-	sprintf(str,"------------------------------               ------------------------------");
-	outtextxy(185,1+0*11,str);
-	str = "";
-	sprintf(str,"|                            | ppp   k  k   |                             |");
-	outtextxy(185,1+1*11,str);
-	str = "";
-	sprintf(str,"|                            | p  p  k k    |                             |");
-	outtextxy(185,1+2*11,str);
-	str = "";
-	sprintf(str,"|                            | ppp   kk     |                             |");
-	outtextxy(185,1+3*11,str);
-	str = "";
-	sprintf(str,"|                            | p     k  k   |                             |");
-	outtextxy(185,1+4*11,str);
-	str = "";
-	sprintf(str,"------------------------------               ------------------------------");
-	outtextxy(185,1+5*11,str);
+
+	Load_24bit_Bmp(165,1,"fight.bmp");
+	Load_24bit_Bmp(528,1,"fight.bmp");
+	Load_24bit_Bmp(458,20,"vs.bmp");
 
 	bmpstr = "";
 	sprintf(bmpstr,"%d.bmp",m);
 	Load_24bit_Bmp(287,1+1*11+6,bmpstr);
-	Load_24bit_Bmp(645,1+1*11+6,"1003.bmp");
 
+	if (!Is_girl) Load_24bit_Bmp(645,1+1*11+6,"1003.bmp");
+	if (Is_girl) Load_24bit_Bmp(645,1+1*11+6,"2003.bmp");
 	if (Sword) Load_24bit_Bmp(580,1+1*11+6,"31.bmp");
 	if (Shield) Load_24bit_Bmp(710,1+1*11+6,"33.bmp");
 
@@ -482,7 +582,7 @@ void Monster_Fight(int m) {
 
 	while (1) {
 		now_line+=13;
-		if (now_line >= 1+20*13) now_line = 1+7*11+13;
+		if (now_line >= 1+20*13) now_line = 1+7*11;
 		setfillstyle(SOLID_FILL,BLACK);
 		bar(185,now_line,800,now_line+13*3-1);
 
@@ -511,12 +611,12 @@ void Monster_Fight(int m) {
 			outtextxy(185,now_line,str);
 		}
 		if (Monster_HP <= 0) break;
-		delay(120);
+		delay(speed);
 
 		random = 1+ rand() % 100;		
 		if (random < Monster_bow[m] && random > Player_miss) {
 			damage = Monster_attack[m] - Player_defend;
-			if (damage < 0) damage = 0;
+			if (damage <= 0) damage = 1;
 			Player_hp-=damage;
 			if (Player_hp < 0) Player_hp=0;
 			setcolor(0xFFFFFF);
@@ -530,7 +630,7 @@ void Monster_Fight(int m) {
 		}
 		if (random >= Monster_bow[m]) {
 			damage = floor((Monster_attack[m] - Player_defend)*1.5);
-			if (damage < 0) damage = 0;
+			if (damage <= 0) damage = 1;
 			Player_hp-=damage;
 			if (Player_hp < 0) Player_hp=0;
 			setcolor(0xEE6A50);
@@ -538,7 +638,7 @@ void Monster_Fight(int m) {
 			outtextxy(185,now_line,str);
 		}
 		if (Player_hp <= 0) break;
-		delay(120);
+		delay(speed);
 	}
 		
 	Player_money  +=  Monster_money[m];
@@ -677,6 +777,7 @@ void Run(char ch) {
 		case 20:
 		case 21:
 		case 22:
+		case 23:
 			m = now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]];
 			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
@@ -685,6 +786,33 @@ void Run(char ch) {
 			Now_i+=x[Now_towards];
 			Now_j+=y[Now_towards];
             Monster_Fight(m);
+			break;
+		case 25:
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
+			check_map[Now_i  ][Now_j] = 0;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
+			now_map[Now_i  ][Now_j] = 0;
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
+			Player_hp /= 3;
+			break;
+		case 26:
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
+			check_map[Now_i  ][Now_j] = 0;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
+			now_map[Now_i  ][Now_j] = 0;
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
+			Player_defend /= 3;
+			break;
+		case 27:
+			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
+			check_map[Now_i  ][Now_j] = 0;
+			now_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 1;
+			now_map[Now_i  ][Now_j] = 0;
+			Now_i+=x[Now_towards];
+			Now_j+=y[Now_towards];
+			Player_attack /= 3;
 			break;
 		case 28:
 			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
@@ -760,6 +888,12 @@ void Run(char ch) {
 			Now_j+=y[Now_towards];
             Books = 1;
 			break;
+		case 10:
+			Tips_Oldman();
+			break;
+		case 24:
+			Tips_Sorceress();
+			break;
 		case 51:
 			Shop();
 			break;
@@ -769,13 +903,17 @@ void Run(char ch) {
 		case 90:
 			Downstairs();	
 			break;
+		case 99:
+			Ending();
+			break;
 	}
 	Map_Print();
 }
 
 void Map_Print(void) {
 	int i, j, number;
-	char * bmpstr = " ";
+	char * str = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!！";
+	char * bmpstr = "                                                                                     ";
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
 			if (!check_map[i][j]) {
@@ -784,12 +922,12 @@ void Map_Print(void) {
 				bar(250+ j*QSC,(i-1)*QSC,250+ j*QSC+QSC-1,(i-1)*QSC+QSC-1);
 
 				number = now_map[i][j];
-				if (now_map[i][j] == 1) 
+				if (now_map[i][j] == 1 && Is_girl == 0) 
 					number = 1000 + Now_towards;
+				if (now_map[i][j] == 1 && Is_girl == 1)
+					number = 2000 + Now_towards;
 
-				bmpstr = "";
 				sprintf(bmpstr,"%d.bmp",number);
-
 				Load_24bit_Bmp(250+ j*QSC,(i-1)*QSC,bmpstr);
 
 			}
@@ -797,6 +935,55 @@ void Map_Print(void) {
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
 			check_map[i][j] = 1;
+
+	Load_24bit_Bmp(185,15,"side.bmp");
+	if (!Is_girl) Load_24bit_Bmp(220,30,"1003.bmp");
+	if (Is_girl) Load_24bit_Bmp(220,30,"2003.bmp");
+
+	setcolor(0x00EEEE);
+	sprintf(str,"Lv");
+	outtextxy(220,100,str);	
+
+	Load_24bit_Bmp(202,70,"info1.bmp");
+	Load_24bit_Bmp(200,130,"info2.bmp");
+	Load_24bit_Bmp(198,145,"info3.bmp");
+	Load_24bit_Bmp(205,215,"info4.bmp");
+
+	setfillstyle(SOLID_FILL,0x000000);
+	bar(235,70,250,90);
+
+	setcolor(0x00EEEE);
+	sprintf(str,"%d ", Player_level);
+	outtextxy(245,100,str);
+
+	setfillstyle(SOLID_FILL,0x000000);
+	bar(223,120,280,210);
+	setfillstyle(SOLID_FILL,0x000000);
+	bar(235,230,255,300);
+
+	setcolor(0xEEEEEE);
+	sprintf(str,"%d ", Now_floor);
+	outtextxy(238,74,str);
+	sprintf(str," %5d", Player_hp);
+	outtextxy(220,130,str);	
+	sprintf(str," %5d", Player_attack);
+	outtextxy(220,145,str);	
+	sprintf(str," %5d", Player_defend);
+	outtextxy(220,160,str);	
+	sprintf(str," %5d", Player_money);
+	outtextxy(220,175,str);	
+	sprintf(str," %5d", Exp_need-Player_exp);
+	outtextxy(220,190,str);	
+
+	setcolor(0xEEEE00);
+	sprintf(str,"%d ", Key_num_yellow);
+	outtextxy(240,235,str);
+	setcolor(0x0000EE);
+	sprintf(str,"%d ", Key_num_blue);
+	outtextxy(240,255,str);
+	setcolor(0xEE0000);
+	sprintf(str,"%d ", Key_num_red);
+	outtextxy(240,275,str);	
 }
 
 void Upstairs(void) {
@@ -838,10 +1025,60 @@ void Quit(void) {
 	Map_Print();
 }
 
-void Esc() {
+void Esc(void) {
+	int i,j,k;
 	cleardevice();
 	text_mode();
+	fp = fopen("memory.txt","w");
+	fprintf(fp,"%d\n",Memory_Player_hp);
+	fprintf(fp,"%d\n",Memory_Player_attack);
+	fprintf(fp,"%d\n",Memory_Player_defend);
+	fprintf(fp,"%d\n",Memory_Player_money);
+	fprintf(fp,"%d\n",Memory_Player_exp);
+	fprintf(fp,"%d\n",Memory_Player_level);
+	fprintf(fp,"%d\n",Memory_Player_miss);
+	fprintf(fp,"%d\n",Memory_Player_bow);
+	fprintf(fp,"%d\n",Memory_Now_i);
+	fprintf(fp,"%d\n",Memory_Now_j);
+	fprintf(fp,"%d\n",Memory_Now_floor);
+	fprintf(fp,"%d\n",Memory_Now_towards);
+	fprintf(fp,"%d\n",Memory_Key_num_yellow);
+	fprintf(fp,"%d\n",Memory_Key_num_blue);
+	fprintf(fp,"%d\n",Memory_Key_num_red);
+	fprintf(fp,"%d\n",Memory_Exp_need);
+	fprintf(fp,"%d\n",Memory_Sword);
+	fprintf(fp,"%d\n",Memory_Shield);
+	fprintf(fp,"%d\n",Memory_Books);
+	fprintf(fp,"%d\n",Memory_Is_girl);
+
+	for (k=1; k<=10; k++)
+		for (i=1; i<=14; i++) {
+			for (j=1; j<=14; j++) 
+				fprintf(fp,"%d ",Memory_map[k][i][j]);
+			fprintf(fp, "\n");
+		}
+
+	fclose(fp);
 	exit(0);
+}
+
+void Ending(void) {
+	char ch;
+	cleardevice();
+	if (!Is_girl) {
+		Load_24bit_Bmp(250,1,"ending1.bmp");
+		while (1) {
+			ch = bioskey(0);
+			Esc();
+		}
+	}
+	if (Is_girl) {
+		Load_24bit_Bmp(250,1,"ending2.bmp");
+		while (1) {
+			ch = bioskey(0);
+			Esc();
+		}
+	}
 }
 
 int Load_24bit_Bmp(int x, int y, char *filename) {
