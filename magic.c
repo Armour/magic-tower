@@ -4,20 +4,12 @@ int Player_hp, Player_attack, Player_defend, Player_money, Player_exp, Player_le
 int Now_i, Now_j, Now_floor, Now_towards;
 int Key_num_yellow, Key_num_blue, Key_num_red;
 int Exp_need, Sword, Shield, Books, Is_girl;
-
-int Memory_Player_hp, Memory_Player_attack, Memory_Player_defend, Memory_Player_money, Memory_Player_exp, Memory_Player_level, Memory_Player_miss, Memory_Player_bow;
-int Memory_Now_i, Memory_Now_j, Memory_Now_floor, Memory_Now_towards;
-int Memory_Key_num_yellow, Memory_Key_num_blue, Memory_Key_num_red;
-int Memory_Exp_need, Memory_Sword, Memory_Shield, Memory_Books, Memory_Is_girl;
-
-int speed;
 int x[5], y[5];
 int Memory_map[11][20][20];
 int map[11][20][20], now_map[20][20], check_map[20][20];
 int Monster_hp[100], Monster_attack[100], Monster_defend[100], Monster_money[100], Monster_exp[100], Monster_miss[100], Monster_bow[100];
 int graphdriver, graphmode;	
-
-FILE *fp;
+int speed;
 
 const int QSC = 32;
 const int LOWSPEED = 200;
@@ -46,9 +38,9 @@ void Info_Prep(void) {
 	Now_floor = 1;
 	Now_towards = 3;
 	
-	Key_num_yellow = 10;
-	Key_num_blue   = 10;
-	Key_num_red    = 10;
+	Key_num_yellow = 0;
+	Key_num_blue   = 0;
+	Key_num_red    = 0;
 	
 	Exp_need = 5;
 	Sword    = 0;
@@ -71,6 +63,7 @@ void Info_Prep(void) {
 void Map_Prep(void) {
 	int i, j, k, floors, ascii = 219;
 	char ch = (char)ascii;
+	FILE *fp;
 
 	fp = fopen("floors.txt","r");
 	for (floors=1; floors<=10; floors++)
@@ -91,34 +84,6 @@ void Map_Prep(void) {
 	}
 	fclose(fp); 
 
-	fp = fopen("memory.txt","r");
-	fscanf(fp,"%d",&Memory_Player_hp);
-	fscanf(fp,"%d",&Memory_Player_attack);
-	fscanf(fp,"%d",&Memory_Player_defend);
-	fscanf(fp,"%d",&Memory_Player_money);
-	fscanf(fp,"%d",&Memory_Player_exp);
-	fscanf(fp,"%d",&Memory_Player_level);
-	fscanf(fp,"%d",&Memory_Player_miss);
-	fscanf(fp,"%d",&Memory_Player_bow);
-	fscanf(fp,"%d",&Memory_Now_i);
-	fscanf(fp,"%d",&Memory_Now_j);
-	fscanf(fp,"%d",&Memory_Now_floor);
-	fscanf(fp,"%d",&Memory_Now_towards);
-	fscanf(fp,"%d",&Memory_Key_num_yellow);
-	fscanf(fp,"%d",&Memory_Key_num_blue);
-	fscanf(fp,"%d",&Memory_Key_num_red);
-	fscanf(fp,"%d",&Memory_Exp_need);
-	fscanf(fp,"%d",&Memory_Sword);
-	fscanf(fp,"%d",&Memory_Shield);
-	fscanf(fp,"%d",&Memory_Books);
-	fscanf(fp,"%d",&Memory_Is_girl);
-
-	for (k=1; k<=10; k++)
-		for (i=1; i<=14; i++) 
-			for (j=1; j<=14; j++) 
-				fscanf(fp,"%d",&Memory_map[k][i][j]);
-	fclose(fp);
-
 	memset(now_map,0,sizeof(now_map));
 	memset(check_map,0,sizeof(check_map));
 
@@ -132,7 +97,7 @@ void Map_Prep(void) {
 void Welcome(void) {
 	char ch;
 
-	Load_24bit_Bmp(50,1,"welcome.bmp");
+	Load_24bit_Bmp(180,1,"welcome.bmp");
 
 	while (1) {
 		ch = bioskey(0);
@@ -160,7 +125,7 @@ void Select_Sex(void) {
 		ch = bioskey(0);
 		if (ch == '1') {
 			Is_girl = 0;
-			Player_hp     = 1500;   //150
+			Player_hp     = 150;   //150
 			Player_attack = 14;
 			Player_defend = 10;
 			Player_miss    = 8;
@@ -169,10 +134,10 @@ void Select_Sex(void) {
 		};
 		if (ch == '2') {
 			Is_girl = 1;
-			Player_hp     = 2000;   //200
+			Player_hp     = 200;   //200
 			Player_attack = 13;
 			Player_defend = 10;
-			Player_miss    = 17;
+			Player_miss    = 18;
 			Player_bow	   = 99;
 			break;
 		}
@@ -195,6 +160,9 @@ void Magic(void) {
 		if (ch == 's') Run('s');	
 		if (ch == 'a') Run('a');	
 		if (ch == 'd') Run('d');	
+		if (ch == '1') speed = HIGHSPEED;
+		if (ch == '2') speed = MIDSPEED;
+		if (ch == '3') speed = HIGHSPEED;
 	}
 }
 
@@ -252,7 +220,7 @@ void Help(void) {
 
 void Shop(void) {
 	char ch;
-	char * str = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+	char * str = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
 	int now_line = 24;
 	cleardevice();
 
@@ -377,6 +345,7 @@ void Shop(void) {
 
 void Set_Memory(void) {
 	int i,j,k;
+	FILE *fp;
 	fp = fopen("memory.txt","w");
 	fprintf(fp,"%d\n",Player_hp);
 	fprintf(fp,"%d\n",Player_attack);
@@ -411,63 +380,37 @@ void Set_Memory(void) {
 				fprintf(fp,"%d ",map[k][i][j]);
 			fprintf(fp, "\n");
 		}
-
-	fclose(fp);
-
-	Memory_Player_hp 		= Player_hp;  	
-	Memory_Player_attack 	= Player_attack; 
-	Memory_Player_defend 	= Player_defend; 
-	Memory_Player_money 	= Player_money;  
-	Memory_Player_exp 		= Player_exp;  
-	Memory_Player_level 	= Player_level; 
-	Memory_Player_miss 		= Player_miss;  
-	Memory_Player_bow 		= Player_bow;  
-	Memory_Now_i 			= Now_i;  		
-	Memory_Now_j 			= Now_j; 		
-	Memory_Now_floor 		= Now_floor;  	
-	Memory_Now_towards 		= Now_towards;  
-	Memory_Key_num_yellow 	= Key_num_yellow;
-	Memory_Key_num_blue 	= Key_num_blue;  
-	Memory_Key_num_red 		= Key_num_red;  
-	Memory_Exp_need 		= Exp_need;  	
-	Memory_Sword 			= Sword;  		
-	Memory_Shield 			= Shield;  	
-	Memory_Books 			= Books; 		
-	Memory_Is_girl 			= Is_girl; 	
-
-	for (k=1; k<=8; k++)
-		for (i=1; i<=14; i++) 
-			for (j=1; j<=14; j++) 
-				Memory_map[k][i][j] = map[k][i][j];	
 }
 
 void Load_Memory(void) {
-	int i, j, k;
-	Player_hp  		= Memory_Player_hp;
-	Player_attack 	= Memory_Player_attack;
-	Player_defend 	= Memory_Player_defend;
-	Player_money  	= Memory_Player_money;
-	Player_exp  	= Memory_Player_exp;
-	Player_level 	= Memory_Player_level;
-	Player_miss  	= Memory_Player_miss;
-	Player_bow  	= Memory_Player_bow;
-	Now_i  			= Memory_Now_i;
-	Now_j 			= Memory_Now_j;
-	Now_floor  		= Memory_Now_floor;
-	Now_towards  	= Memory_Now_towards;
-	Key_num_yellow	= Memory_Key_num_yellow;
-	Key_num_blue  	= Memory_Key_num_blue;
-	Key_num_red  	= Memory_Key_num_red;
-	Exp_need  		= Memory_Exp_need;
-	Sword  			= Memory_Sword;
-	Shield  		= Memory_Shield;
-	Books 			= Memory_Books;
-	Is_girl 		= Memory_Is_girl;
+	int i,j,k;
+	FILE *fp;
+	fp = fopen("memory.txt","r");
+	fscanf(fp,"%d",&Player_hp);
+	fscanf(fp,"%d",&Player_attack);
+	fscanf(fp,"%d",&Player_defend);
+	fscanf(fp,"%d",&Player_money);
+	fscanf(fp,"%d",&Player_exp);
+	fscanf(fp,"%d",&Player_level);
+	fscanf(fp,"%d",&Player_miss);
+	fscanf(fp,"%d",&Player_bow);
+	fscanf(fp,"%d",&Now_i);
+	fscanf(fp,"%d",&Now_j);
+	fscanf(fp,"%d",&Now_floor);
+	fscanf(fp,"%d",&Now_towards);
+	fscanf(fp,"%d",&Key_num_yellow);
+	fscanf(fp,"%d",&Key_num_blue);
+	fscanf(fp,"%d",&Key_num_red);
+	fscanf(fp,"%d",&Exp_need);
+	fscanf(fp,"%d",&Sword);
+	fscanf(fp,"%d",&Shield);
+	fscanf(fp,"%d",&Books);
+	fscanf(fp,"%d",&Is_girl);
 
 	for (k=1; k<=10; k++)
 		for (i=1; i<=14; i++) 
-			for (j=1; j<=14; j++) 
-				map[k][i][j] = Memory_map[k][i][j];	
+			for (j=1; j<=14; j++)
+				fscanf(fp,"%d",&map[k][i][j]);
 
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++){
@@ -507,8 +450,8 @@ void Monster_Book(void) {
 	int i, j;
 	int exist[30];
 	char ch;
-	char * str = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
-	char * bmpstr = "                                                                      ";
+	char * str = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!";
+	char * bmpstr = "                                                                                ";
 	cleardevice();
 	for (i=1; i<=30; i++)
 		exist[i] = 0;
@@ -520,7 +463,6 @@ void Monster_Book(void) {
 	for (j=11; j<=22; j++) 
 		if (exist[j]) {
 			i++;
-			bmpstr = "";
 			sprintf(bmpstr,"%d.bmp",j);
 			Load_24bit_Bmp(50,(i-11)*52+1*12,bmpstr);
 
@@ -537,14 +479,10 @@ void Monster_Book(void) {
 			outtextxy(650,(i-11)*52+2*12,str);
 		}
 
-	setcolor(0x666666);
-	outtextxy(250,800,"     ( Please enter \'q\' to quit. )     ");
 	while (1) {
 		ch = bioskey(0);
-		if (ch == 'q'){
-			Quit();
-			break;
-		}
+		Quit();
+		break;
 	}
 }
 
@@ -564,7 +502,6 @@ void Monster_Fight(int m) {
 	Load_24bit_Bmp(528,1,"fight.bmp");
 	Load_24bit_Bmp(458,20,"vs.bmp");
 
-	bmpstr = "";
 	sprintf(bmpstr,"%d.bmp",m);
 	Load_24bit_Bmp(287,1+1*11+6,bmpstr);
 
@@ -573,7 +510,6 @@ void Monster_Fight(int m) {
 	if (Sword) Load_24bit_Bmp(580,1+1*11+6,"31.bmp");
 	if (Shield) Load_24bit_Bmp(710,1+1*11+6,"33.bmp");
 
-	str = "";
 	setcolor(0xFFFFFF);
 	sprintf(str,"                %5d                          %5d",Monster_HP,Player_hp);
 	outtextxy(185,1+7*11,str);
@@ -582,7 +518,7 @@ void Monster_Fight(int m) {
 
 	while (1) {
 		now_line+=13;
-		if (now_line >= 1+20*13) now_line = 1+7*11;
+		if (now_line >= 1+30*13) now_line = 1+7*11;
 		setfillstyle(SOLID_FILL,BLACK);
 		bar(185,now_line,800,now_line+13*3-1);
 
@@ -913,7 +849,7 @@ void Run(char ch) {
 void Map_Print(void) {
 	int i, j, number;
 	char * str = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!！";
-	char * bmpstr = "                                                                                     ";
+	char * bmpstr = "                                                                                      ";
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
 			if (!check_map[i][j]) {
@@ -948,6 +884,12 @@ void Map_Print(void) {
 	Load_24bit_Bmp(200,130,"info2.bmp");
 	Load_24bit_Bmp(198,145,"info3.bmp");
 	Load_24bit_Bmp(205,215,"info4.bmp");
+
+	if (Books) {
+		Load_24bit_Bmp(205,325,"book.bmp");
+		setcolor(0xEEEEEE);
+		outtextxy(240,335,"B");	
+	}
 
 	setfillstyle(SOLID_FILL,0x000000);
 	bar(235,70,250,90);
@@ -1029,36 +971,6 @@ void Esc(void) {
 	int i,j,k;
 	cleardevice();
 	text_mode();
-	fp = fopen("memory.txt","w");
-	fprintf(fp,"%d\n",Memory_Player_hp);
-	fprintf(fp,"%d\n",Memory_Player_attack);
-	fprintf(fp,"%d\n",Memory_Player_defend);
-	fprintf(fp,"%d\n",Memory_Player_money);
-	fprintf(fp,"%d\n",Memory_Player_exp);
-	fprintf(fp,"%d\n",Memory_Player_level);
-	fprintf(fp,"%d\n",Memory_Player_miss);
-	fprintf(fp,"%d\n",Memory_Player_bow);
-	fprintf(fp,"%d\n",Memory_Now_i);
-	fprintf(fp,"%d\n",Memory_Now_j);
-	fprintf(fp,"%d\n",Memory_Now_floor);
-	fprintf(fp,"%d\n",Memory_Now_towards);
-	fprintf(fp,"%d\n",Memory_Key_num_yellow);
-	fprintf(fp,"%d\n",Memory_Key_num_blue);
-	fprintf(fp,"%d\n",Memory_Key_num_red);
-	fprintf(fp,"%d\n",Memory_Exp_need);
-	fprintf(fp,"%d\n",Memory_Sword);
-	fprintf(fp,"%d\n",Memory_Shield);
-	fprintf(fp,"%d\n",Memory_Books);
-	fprintf(fp,"%d\n",Memory_Is_girl);
-
-	for (k=1; k<=10; k++)
-		for (i=1; i<=14; i++) {
-			for (j=1; j<=14; j++) 
-				fprintf(fp,"%d ",Memory_map[k][i][j]);
-			fprintf(fp, "\n");
-		}
-
-	fclose(fp);
 	exit(0);
 }
 
@@ -1119,3 +1031,6 @@ int Load_24bit_Bmp(int x, int y, char *filename) {
 	   fclose(fp);
     return 0;
 }
+
+/* -----------------------------------------------by Armour---------------------------------------------------*/
+/* -----------------------------------------QQ497052684 欢迎勾搭=w=-------------------------------------------*/
