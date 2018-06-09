@@ -5,7 +5,7 @@
 #include <time.h>
 #include <string.h>
 #include <bios.h>
-#include "graphics.h" 
+#include "graphics.h"
 
 void Run(char);
 void Esc(void);

@@ -8,7 +8,7 @@ int x[5], y[5];
 int Memory_map[11][20][20];
 int map[11][20][20], now_map[20][20], check_map[20][20];
 int Monster_hp[100], Monster_attack[100], Monster_defend[100], Monster_money[100], Monster_exp[100], Monster_miss[100], Monster_bow[100];
-int graphdriver, graphmode;	
+int graphdriver, graphmode;
 int speed;
 
 const int QSC = 32;
@@ -26,9 +26,9 @@ int main(void) {
 void Info_Prep(void) {
 	graphdriver = DETECT;
 	graphmode = VESA_1024x768x24bit;
-   	initgraph(&graphdriver, &graphmode, "");
+	initgraph(&graphdriver, &graphmode, "");
 	cleardevice();
-	
+
 	Player_money   = 0;
 	Player_exp     = 0;
 	Player_level   = 0;
@@ -37,11 +37,11 @@ void Info_Prep(void) {
 	Now_j   = 7;
 	Now_floor = 1;
 	Now_towards = 3;
-	
+
 	Key_num_yellow = 0;
 	Key_num_blue   = 0;
 	Key_num_red    = 0;
-	
+
 	Exp_need = 5;
 	Sword    = 0;
 	Shield   = 0;
@@ -68,7 +68,7 @@ void Map_Prep(void) {
 	fp = fopen("floors.txt","r");
 	for (floors=1; floors<=10; floors++)
 		for (i=1; i<=14; i++)
-			for (j=1; j<=14; j++) 
+			for (j=1; j<=14; j++)
 				fscanf(fp,"%d",&map[floors][i][j]);
 	fclose(fp);
 
@@ -82,7 +82,7 @@ void Map_Prep(void) {
 		fscanf(fp, "%d", &Monster_miss[i]);
 		fscanf(fp, "%d", &Monster_bow[i]);
 	}
-	fclose(fp); 
+	fclose(fp);
 
 	memset(now_map,0,sizeof(now_map));
 	memset(check_map,0,sizeof(check_map));
@@ -97,7 +97,7 @@ void Map_Prep(void) {
 void Welcome(void) {
 	char ch;
 
-	Load_24bit_Bmp(180,1,"welcome.bmp");
+	Load_24bit_Bmp(180,1,"assets/welcome.bmp");
 
 	while (1) {
 		ch = bioskey(0);
@@ -105,7 +105,7 @@ void Welcome(void) {
 			cleardevice();
 			Select_Sex();
 			break;
-		} 
+		}
 		if (ch == '2') {
 			Load_Memory();
 			break;
@@ -120,7 +120,7 @@ void Welcome(void) {
 
 void Select_Sex(void) {
 	char ch;
-	Load_24bit_Bmp(250,1,"select.bmp");
+	Load_24bit_Bmp(250,1,"assets/select.bmp");
 	while (1) {
 		ch = bioskey(0);
 		if (ch == '1') {
@@ -150,16 +150,16 @@ void Magic(void) {
 	Map_Print();
 	while (1) {
 		ch = bioskey(0);
-		if (ch == '`') Esc();	
-		//if (ch == 'i') Soldier_Info();		
+		if (ch == '`') Esc();
+		//if (ch == 'i') Soldier_Info();
 		if (ch == 'b') if (Books) Monster_Book();
-		if (ch == 'h') Help(); 
+		if (ch == 'h') Help();
 		if (ch == 'm') Set_Memory();
 		if (ch == 'l') Load_Memory();
-		if (ch == 'w') Run('w');	
-		if (ch == 's') Run('s');	
-		if (ch == 'a') Run('a');	
-		if (ch == 'd') Run('d');	
+		if (ch == 'w') Run('w');
+		if (ch == 's') Run('s');
+		if (ch == 'a') Run('a');
+		if (ch == 'd') Run('d');
 		if (ch == '1') speed = HIGHSPEED;
 		if (ch == '2') speed = MIDSPEED;
 		if (ch == '3') speed = HIGHSPEED;
@@ -181,15 +181,15 @@ void Magic(void) {
 
 	setcolor(0xEE0000);
 	sprintf(str,"                         Red Key    :%8d", Key_num_red);
-	outtextxy(200,10+11*11,str);	
-	
+	outtextxy(200,10+11*11,str);
+
 	setcolor(0x00EE00);
 	sprintf(str,"          HP:  %8d      Attack:  %8d      Defend:  %8d ", Player_hp, Player_attack, Player_defend);
-	outtextxy(185,10+17*11,str);	
+	outtextxy(185,10+17*11,str);
 
 	setcolor(0x00EEEE);
 	sprintf(str,"          Lv:  %8d      Money :  %8d      Exp   :  %8d ", Player_level, Player_money, Player_exp);
-	outtextxy(185,10+23*11,str);	
+	outtextxy(185,10+23*11,str);
 
 	setcolor(0xFF00FF);
 	sprintf(str,"                         Next Level:  %8d ", Exp_need-Player_exp);
@@ -197,7 +197,7 @@ void Magic(void) {
 
 	setcolor(0x666666);
 	outtextxy(200,10+40*11,"                      ( Please enter \'q\' to quit. )     ");
-	
+
 	while (1) {
 		ch = bioskey(0);
 		if (ch == 'q'){
@@ -210,7 +210,7 @@ void Magic(void) {
 void Help(void) {
 	char ch;
 	cleardevice();
-	Load_24bit_Bmp(250,1,"help.bmp");
+	Load_24bit_Bmp(250,1,"assets/help.bmp");
 	while (1) {
 		ch = bioskey(0);
 		Quit();
@@ -243,7 +243,7 @@ void Shop(void) {
 	setcolor(0x0000EE);
 	sprintf(str,"            5.Blue Key + 1       Cost 120");
 	outtextxy(250,10+10*11,str);
-	
+
 	setcolor(0xEE0000);
 	sprintf(str,"            6.Red Key + 1        Cost 300");
 	outtextxy(250,10+12*11,str);
@@ -255,7 +255,7 @@ void Shop(void) {
 	setcolor(0x666666);
 	sprintf(str,"           ( Please enter \'q\' to quit. )   ");
 	outtextxy(250,10+18*11,str);
-		
+
 	while (1){
 		ch = bioskey(0);
 		if (ch == '1' && Player_money >= 50){
@@ -268,7 +268,7 @@ void Shop(void) {
 			outtextxy(250,10+now_line*11,str);
 			now_line += 2;
 			if (now_line > 45) now_line = 24;
-		}	else 
+		}	else
 		if (ch == '2' && Player_money >= 50){
 			Player_money-=50;
 			Player_attack += 2;
@@ -323,7 +323,7 @@ void Shop(void) {
 			outtextxy(250,10+now_line*11,str);
 			now_line += 2;
 			if (now_line > 45) now_line = 24;
-		}	else 
+		}	else
 		if (ch == '1' || ch == '2' || ch == '3' || ch== '4' || ch =='5' || ch == '6') {
 			setfillstyle(SOLID_FILL,BLACK);
 			bar(250,10+now_line*11,800,10+(now_line+4)*11+3);
@@ -338,8 +338,8 @@ void Shop(void) {
 		setcolor(0xFFFFFF);
 		sprintf(str,"       Your Money: %d",Player_money);
 		outtextxy(250,10+14*11,str);
-		if (ch == 'q')	break;	
-	}	
+		if (ch == 'q')	break;
+	}
 	Quit();
 }
 
@@ -371,12 +371,12 @@ void Set_Memory(void) {
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
 			map[Now_floor][i][j] = now_map[i][j];
-	
+
 	map[Now_floor][Now_i][Now_j] = 0;
-	
+
 	for (k=1; k<=10; k++)
 		for (i=1; i<=14; i++) {
-			for (j=1; j<=14; j++) 
+			for (j=1; j<=14; j++)
 				fprintf(fp,"%d ",map[k][i][j]);
 			fprintf(fp, "\n");
 		}
@@ -408,7 +408,7 @@ void Load_Memory(void) {
 	fscanf(fp,"%d",&Is_girl);
 
 	for (k=1; k<=10; k++)
-		for (i=1; i<=14; i++) 
+		for (i=1; i<=14; i++)
 			for (j=1; j<=14; j++)
 				fscanf(fp,"%d",&map[k][i][j]);
 
@@ -419,7 +419,7 @@ void Load_Memory(void) {
 		}
 
 	now_map[Now_i][Now_j] = 1;
-	
+
 	cleardevice();
 	Map_Print();
 }
@@ -427,7 +427,7 @@ void Load_Memory(void) {
 void Tips_Oldman(void) {
 	char ch;
 	cleardevice();
-	Load_24bit_Bmp(250,1,"tips1.bmp");
+	Load_24bit_Bmp(250,1,"assets/tips1.bmp");
 	while (1) {
 		ch = bioskey(0);
 		Quit();
@@ -438,7 +438,7 @@ void Tips_Oldman(void) {
 void Tips_Sorceress(void) {
 	char ch;
 	cleardevice();
-	Load_24bit_Bmp(250,1,"tips2.bmp");
+	Load_24bit_Bmp(250, 1, "assets/tips2.bmp");
 	while (1) {
 		ch = bioskey(0);
 		Quit();
@@ -460,10 +460,10 @@ void Monster_Book(void) {
 			if (now_map[i][j] >= 11 && now_map[i][j] <= 22)
 				exist[now_map[i][j]] = 1;
 	i = 10;
-	for (j=11; j<=22; j++) 
+	for (j=11; j<=22; j++)
 		if (exist[j]) {
 			i++;
-			sprintf(bmpstr,"%d.bmp",j);
+			sprintf(bmpstr, "assets/%d.bmp", j);
 			Load_24bit_Bmp(50,(i-11)*52+1*12,bmpstr);
 
 			setcolor(0x00EE00);
@@ -498,17 +498,21 @@ void Monster_Fight(int m) {
 
 	cleardevice();
 
-	Load_24bit_Bmp(165,1,"fight.bmp");
-	Load_24bit_Bmp(528,1,"fight.bmp");
-	Load_24bit_Bmp(458,20,"vs.bmp");
+	Load_24bit_Bmp(165, 1, "assets/fight.bmp");
+	Load_24bit_Bmp(528, 1, "assets/fight.bmp");
+	Load_24bit_Bmp(458, 20, "assets/vs.bmp");
 
-	sprintf(bmpstr,"%d.bmp",m);
+	sprintf(bmpstr, "assets/%d.bmp", m);
 	Load_24bit_Bmp(287,1+1*11+6,bmpstr);
 
-	if (!Is_girl) Load_24bit_Bmp(645,1+1*11+6,"1003.bmp");
-	if (Is_girl) Load_24bit_Bmp(645,1+1*11+6,"2003.bmp");
-	if (Sword) Load_24bit_Bmp(580,1+1*11+6,"31.bmp");
-	if (Shield) Load_24bit_Bmp(710,1+1*11+6,"33.bmp");
+	if (!Is_girl)
+		Load_24bit_Bmp(645, 1 + 1 * 11 + 6, "assets/1003.bmp");
+	if (Is_girl)
+		Load_24bit_Bmp(645, 1 + 1 * 11 + 6, "assets/2003.bmp");
+	if (Sword)
+		Load_24bit_Bmp(580, 1 + 1 * 11 + 6, "assets/31.bmp");
+	if (Shield)
+		Load_24bit_Bmp(710, 1 + 1 * 11 + 6, "assets/33.bmp");
 
 	setcolor(0xFFFFFF);
 	sprintf(str,"                %5d                          %5d",Monster_HP,Player_hp);
@@ -549,7 +553,7 @@ void Monster_Fight(int m) {
 		if (Monster_HP <= 0) break;
 		delay(speed);
 
-		random = 1+ rand() % 100;		
+		random = 1+ rand() % 100;
 		if (random < Monster_bow[m] && random > Player_miss) {
 			damage = Monster_attack[m] - Player_defend;
 			if (damage <= 0) damage = 1;
@@ -576,9 +580,9 @@ void Monster_Fight(int m) {
 		if (Player_hp <= 0) break;
 		delay(speed);
 	}
-		
+
 	Player_money  +=  Monster_money[m];
-	Player_exp  +=  Monster_exp[m];	
+	Player_exp  +=  Monster_exp[m];
 
 	cleardevice();
 	setcolor(0xEE0000);
@@ -614,7 +618,7 @@ void Monster_Fight(int m) {
 
 void Monster_Defeated(void) {
 	cleardevice();
-	Load_24bit_Bmp(45, 1, "defeated.bmp");
+	Load_24bit_Bmp(45, 1, "assets/defeated.bmp");
 	delay(3000);
 	cleardevice();
 	text_mode();
@@ -776,7 +780,7 @@ void Run(char ch) {
 			Now_i+=x[Now_towards];
 			Now_j+=y[Now_towards];
 			Player_hp += 30;
-			break;	
+			break;
 		case 31:
 			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
@@ -785,7 +789,7 @@ void Run(char ch) {
 			Now_i+=x[Now_towards];
 			Now_j+=y[Now_towards];
 			Sword = 1;
-            Player_attack += 10;
+			Player_attack += 10;
 			break;
 		case 32:
 			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
@@ -794,7 +798,7 @@ void Run(char ch) {
 			now_map[Now_i  ][Now_j] = 0;
 			Now_i+=x[Now_towards];
 			Now_j+=y[Now_towards];
-            Player_attack += 3;
+			Player_attack += 3;
 			break;
 		case 33:
 			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
@@ -804,7 +808,7 @@ void Run(char ch) {
 			Now_i+=x[Now_towards];
 			Now_j+=y[Now_towards];
 			Shield = 1;
-            Player_defend += 8;
+			Player_defend += 8;
 			break;
 		case 34:
 			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
@@ -813,8 +817,8 @@ void Run(char ch) {
 			now_map[Now_i  ][Now_j] = 0;
 			Now_i+=x[Now_towards];
 			Now_j+=y[Now_towards];
-            Player_defend += 2;
-            break;
+			Player_defend += 2;
+			break;
 		case 35:
 			check_map[Now_i+x[Now_towards]][Now_j+y[Now_towards]] = 0;
 			check_map[Now_i  ][Now_j] = 0;
@@ -822,7 +826,7 @@ void Run(char ch) {
 			now_map[Now_i  ][Now_j] = 0;
 			Now_i+=x[Now_towards];
 			Now_j+=y[Now_towards];
-            Books = 1;
+			Books = 1;
 			break;
 		case 10:
 			Tips_Oldman();
@@ -837,7 +841,7 @@ void Run(char ch) {
 			Upstairs();
 			break;
 		case 90:
-			Downstairs();	
+			Downstairs();
 			break;
 		case 99:
 			Ending();
@@ -853,42 +857,42 @@ void Map_Print(void) {
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
 			if (!check_map[i][j]) {
-
 				setfillstyle(SOLID_FILL,0x000000);
 				bar(250+ j*QSC,(i-1)*QSC,250+ j*QSC+QSC-1,(i-1)*QSC+QSC-1);
 
 				number = now_map[i][j];
-				if (now_map[i][j] == 1 && Is_girl == 0) 
+				if (now_map[i][j] == 1 && Is_girl == 0)
 					number = 1000 + Now_towards;
 				if (now_map[i][j] == 1 && Is_girl == 1)
 					number = 2000 + Now_towards;
 
-				sprintf(bmpstr,"%d.bmp",number);
-				Load_24bit_Bmp(250+ j*QSC,(i-1)*QSC,bmpstr);
-
+				sprintf(bmpstr, "assets/%d.bmp", number);
+				Load_24bit_Bmp(250+ j*QSC, (i-1)*QSC, bmpstr);
 			}
 
 	for (i=1; i<=14; i++)
 		for (j=1; j<=14; j++)
 			check_map[i][j] = 1;
 
-	Load_24bit_Bmp(185,15,"side.bmp");
-	if (!Is_girl) Load_24bit_Bmp(220,30,"1003.bmp");
-	if (Is_girl) Load_24bit_Bmp(220,30,"2003.bmp");
+	Load_24bit_Bmp(185, 15, "assets/side.bmp");
+	if (!Is_girl)
+		Load_24bit_Bmp(220, 30, "assets/1003.bmp");
+	if (Is_girl)
+		Load_24bit_Bmp(220, 30, "assets/2003.bmp");
 
 	setcolor(0x00EEEE);
 	sprintf(str,"Lv");
-	outtextxy(220,100,str);	
+	outtextxy(220,100,str);
 
-	Load_24bit_Bmp(202,70,"info1.bmp");
-	Load_24bit_Bmp(200,130,"info2.bmp");
-	Load_24bit_Bmp(198,145,"info3.bmp");
-	Load_24bit_Bmp(205,215,"info4.bmp");
+	Load_24bit_Bmp(202, 70, "assets/info1.bmp");
+	Load_24bit_Bmp(200, 130, "assets/info2.bmp");
+	Load_24bit_Bmp(198, 145, "assets/info3.bmp");
+	Load_24bit_Bmp(205, 215, "assets/info4.bmp");
 
 	if (Books) {
-		Load_24bit_Bmp(205,325,"book.bmp");
+		Load_24bit_Bmp(205, 325, "assets/book.bmp");
 		setcolor(0xEEEEEE);
-		outtextxy(240,335,"B");	
+		outtextxy(240,335,"B");
 	}
 
 	setfillstyle(SOLID_FILL,0x000000);
@@ -907,15 +911,15 @@ void Map_Print(void) {
 	sprintf(str,"%d ", Now_floor);
 	outtextxy(238,74,str);
 	sprintf(str," %5d", Player_hp);
-	outtextxy(220,130,str);	
+	outtextxy(220,130,str);
 	sprintf(str," %5d", Player_attack);
-	outtextxy(220,145,str);	
+	outtextxy(220,145,str);
 	sprintf(str," %5d", Player_defend);
-	outtextxy(220,160,str);	
+	outtextxy(220,160,str);
 	sprintf(str," %5d", Player_money);
-	outtextxy(220,175,str);	
+	outtextxy(220,175,str);
 	sprintf(str," %5d", Exp_need-Player_exp);
-	outtextxy(220,190,str);	
+	outtextxy(220,190,str);
 
 	setcolor(0xEEEE00);
 	sprintf(str,"%d ", Key_num_yellow);
@@ -925,7 +929,7 @@ void Map_Print(void) {
 	outtextxy(240,255,str);
 	setcolor(0xEE0000);
 	sprintf(str,"%d ", Key_num_red);
-	outtextxy(240,275,str);	
+	outtextxy(240,275,str);
 }
 
 void Upstairs(void) {
@@ -938,7 +942,7 @@ void Upstairs(void) {
 			now_map[i][j] = map[Now_floor+1][i][j] ;
 			check_map[i][j] = 0;
 		}
-	Now_floor++; 
+	Now_floor++;
 	now_map[Now_i][Now_j] = 1;
 	Map_Print();
 }
@@ -953,7 +957,7 @@ void Downstairs(void) {
 			now_map[i][j] = map[Now_floor-1][i][j] ;
 			check_map[i][j] = 0;
 		}
-	Now_floor--; 
+	Now_floor--;
 	now_map[Now_i][Now_j] = 1;
 	Map_Print();
 }
@@ -978,14 +982,14 @@ void Ending(void) {
 	char ch;
 	cleardevice();
 	if (!Is_girl) {
-		Load_24bit_Bmp(250,1,"ending1.bmp");
+		Load_24bit_Bmp(250, 1, "assets/ending1.bmp");
 		while (1) {
 			ch = bioskey(0);
 			Esc();
 		}
 	}
 	if (Is_girl) {
-		Load_24bit_Bmp(250,1,"ending2.bmp");
+		Load_24bit_Bmp(250, 1, "assets/ending2.bmp");
 		while (1) {
 			ch = bioskey(0);
 			Esc();
@@ -999,24 +1003,23 @@ int Load_24bit_Bmp(int x, int y, char *filename) {
 	byte *vp = _vp + (_active_page*_page_gap + y*_width + x) * (_color_bits/8);
 	dword width, height, bmp_data_offset, bytes_per_line, offset;
 	int i;
-	p = malloc(1024L * 3);  /* memory for holding a line of bmp data */
-	if(p == NULL)  /* cannot allocate enough memory for drawing 1 line */
+	p = malloc(1024L * 3); /* memory for holding a line of bmp data */
+	if (p == NULL) /* cannot allocate enough memory for drawing 1 line */
 	   goto display_bmp_error;
 	fp = fopen(filename, "rb");
-	if(fp == NULL) /* cannot open bmp file */
+	if (fp == NULL) /* cannot open bmp file */
 	   goto display_bmp_error;
-	fread(p, 1, 0x36, fp);     /* read BMP head */
-	if(*(word *)p != 0x4D42)   /* check BMP signature */
+	fread(p, 1, 0x36, fp); /* read BMP head */
+	if (*(word *)p != 0x4D42) /* check BMP signature */
 	   goto display_bmp_error; /* not a BMP file */
-	if(*(word *)(p+0x1C) != 24)
+	if (*(word *)(p+0x1C) != 24)
 	   goto display_bmp_error; /* not a 24-bit-color BMP file */
 	width = *(dword *)(p+0x12);
 	height = *(dword *)(p+0x16);
 	bmp_data_offset = *(dword *)(p+0x0A);
 	fseek(fp, bmp_data_offset, SEEK_SET); /* skip BMP head */
 	bytes_per_line = (width * 3 + 3) / 4 * 4; /* must be multiple of 4 */
-	for(i=height-1; i>=0; i--)          /* draw from bottom to top */
-	{
+	for (i=height-1; i>=0; i--) { /* draw from bottom to top */
 	   fread(p, 1, bytes_per_line, fp); /* read a line of bmp data */
 	   offset = i * 1024 * 3;
 	   memcpy(vp+offset, p, width*3);
@@ -1029,7 +1032,7 @@ int Load_24bit_Bmp(int x, int y, char *filename) {
 	   free(p);
 	if(fp != NULL)
 	   fclose(fp);
-    return 0;
+	return 0;
 }
 
 /* -----------------------------------------------by Armour---------------------------------------------------*/
